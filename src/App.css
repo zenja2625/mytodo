@@ -4,3 +4,31 @@
     display: flex;
     justify-content: space-between;
 }
+
+main {
+    display: flex;
+    height: 100%;
+}
+
+.categories {
+    width: 300px;
+    transition: width 200ms ease;
+    background-color: greenyellow;
+    overflow: hidden;
+}
+
+@media only screen and (max-width: 600px) {
+    .categories.hidden {
+        width: 0px;
+    }
+    .categories {
+        position: absolute;
+        height: 100%;
+        background-color: lime;
+    }
+}
+
+.todos {
+    flex-grow: 1;
+    background-color: red;
+}

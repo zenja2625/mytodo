@@ -1,3 +1,10 @@
+import { Categories } from './Categories'
+
 export const Main = () => {
-    return <div>Main</div>
+    return (
+        <main>
+            <Categories />
+            <div className='todos'>ToDos</div>
+        </main>
+    )
 }
