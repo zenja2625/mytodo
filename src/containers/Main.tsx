@@ -1,10 +1,11 @@
 import { Categories } from './Categories'
+import { Todos } from './todos/Todos'
 
 export const Main = () => {
     return (
         <main>
             <Categories />
-            <div className='todos'>ToDos</div>
+            <Todos />
         </main>
     )
 }

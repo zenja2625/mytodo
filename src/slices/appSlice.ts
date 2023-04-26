@@ -1,8 +1,8 @@
 import { Action, AnyAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 // import { message } from 'antd'
 import { loginThunk, userInfoThunk } from './accountSlice'
-// import { getCategoriesThunk } from './categoriesSlice'
 import { AppType, IState } from './sliceTypes'
+import { getCategoriesThunk } from './categoriesSlice'
 
 const initialState: AppType = {
     initialized: false,
@@ -28,8 +28,8 @@ export const initializeApp = createAsyncThunk<void, void, IState>(
     'app/initializeApp',
     async (_, { dispatch, getState }) => {
         await dispatch(userInfoThunk())
-        // if (getState().account.isAuth)
-        //     await dispatch(getCategoriesThunk())
+        if (getState().account.isAuth)
+            await dispatch(getCategoriesThunk())
     }
 )
 

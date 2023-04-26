@@ -13,7 +13,9 @@ export const Header = () => {
     return (
         <div className='header'>
             <div style={{ display: 'flex' }}>
-                <button onClick={() => dispatch(toggleSider())}>{siderCollapsed ? 'colaps' : 'show'}</button>
+                <button onClick={() => dispatch(toggleSider())}>
+                    {siderCollapsed ? 'colaps' : 'show'}
+                </button>
                 <div
                     onClick={() => {
                         navigate('/')
