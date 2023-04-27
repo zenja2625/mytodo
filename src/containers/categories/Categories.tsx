@@ -1,9 +1,7 @@
-import { useNavigate } from 'react-router-dom'
-import { useAppSelector } from '../slices/store'
+import { useAppSelector } from '../../slices/store'
+import { CategoryItem } from './CategoryItem'
 
 export const Categories = () => {
-    const navigate = useNavigate()
-
     const categories = useAppSelector(state => state.categories.items)
     const siderCollapsed = useAppSelector(state => state.app.siderCollapsed)
 
@@ -13,14 +11,7 @@ export const Categories = () => {
         <div className={className}>
             Categories:
             {categories.map(item => (
-                <div
-                    onClick={() => {
-                        navigate(`/category/${item.id}`)
-                    }}
-                    key={item.id}
-                >
-                    {item.name}
-                </div>
+                <CategoryItem key={item.id} {...item} />
             ))}
         </div>
     )

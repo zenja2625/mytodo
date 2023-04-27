@@ -25,7 +25,10 @@ export const Header = () => {
                 </div>
             </div>
             {!isAuth ? (
-                'Вход'
+                <div>
+                    <button onClick={() => {navigate('/login')}}>Вход</button>
+                    <button onClick={() => {navigate('/register')}}>Регистрация</button>
+                </div>
             ) : (
                 <div>
                     {username}

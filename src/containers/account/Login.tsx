@@ -1,24 +1,38 @@
-import { useState } from 'react'
+import { useCallback } from 'react'
 import { useAppDispatch } from '../../slices/store'
 import { loginThunk } from '../../slices/accountSlice'
+import { SubmitHandler } from 'react-hook-form'
+import { UserLoginDTO } from '../../api/apiTypes'
+import { Form } from '../utils/Form'
+import { FormFieldsType } from '../utils/types'
 
 export const Login = () => {
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
-
     const dispath = useAppDispatch()
 
+    const onSubmit: SubmitHandler<UserLoginDTO> = useCallback(
+        async data => {
+            await dispath(loginThunk(data))
+        },
+        [dispath]
+    )
+
+    const value: FormFieldsType<UserLoginDTO> = {
+        name: {
+            options: {
+                required: 'Это поле обязательно',
+            },
+        },
+        password: {
+            options: {
+                required: 'Это поле обязательно',
+                minLength: { value: 4, message: 'Не менее 4 символов' },
+            },
+        },
+    }
+
     return (
-        <div>
-            <input type='text' value={username} onChange={e => setUsername(e.target.value)} />
-            <input type='text' value={password} onChange={e => setPassword(e.target.value)} />
-            <button
-                onClick={() => {
-                    dispath(loginThunk({ name: username, password }))
-                }}
-            >
-                Click
-            </button>
-        </div>
+        <>
+            <Form fields={value} onSubmit={onSubmit} />
+        </>
     )
 }

@@ -10,6 +10,7 @@ import { RequireAuth } from './containers/utils/RequireAuth'
 import { Login } from './containers/account/Login'
 import { initializeApp } from './slices/appSlice'
 import { useAppDispatch, useAppSelector } from './slices/store'
+import { Register } from './containers/account/Register'
 
 export const App = () => {
     const isAuth = useAppSelector(state => state.account.isAuth)
@@ -33,7 +34,7 @@ export const App = () => {
             <Routes>
                 <Route element={<RedirectAuth />}>
                     <Route path='/login' element={<Login />} />
-                    <Route path='/register' element={<Login />} />
+                    <Route path='/register' element={<Register />} />
                 </Route>
 
                 <Route element={<RequireAuth />}>
