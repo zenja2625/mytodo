@@ -11,6 +11,7 @@ import { Login } from './containers/account/Login'
 import { initializeApp } from './slices/appSlice'
 import { useAppDispatch, useAppSelector } from './slices/store'
 import { Register } from './containers/account/Register'
+import { ModalContext } from './containers/ModalContext'
 
 export const App = () => {
     const isAuth = useAppSelector(state => state.account.isAuth)
@@ -25,25 +26,27 @@ export const App = () => {
 
     return (
         <>
-            <Header />
-            <div style={{ position: 'absolute', zIndex: '1000', right: 0 }}>
-                <div>isAuth: {isAuth.toString()}</div>
-                <div>initialized: {initialized.toString()}</div>
-            </div>
+            <ModalContext>
+                <Header />
+                <div style={{ position: 'absolute', zIndex: '1000', right: 0 }}>
+                    <div>isAuth: {isAuth.toString()}</div>
+                    <div>initialized: {initialized.toString()}</div>
+                </div>
 
-            <Routes>
-                <Route element={<RedirectAuth />}>
-                    <Route path='/login' element={<Login />} />
-                    <Route path='/register' element={<Register />} />
-                </Route>
+                <Routes>
+                    <Route element={<RedirectAuth />}>
+                        <Route path='/login' element={<Login />} />
+                        <Route path='/register' element={<Register />} />
+                    </Route>
 
-                <Route element={<RequireAuth />}>
-                    <Route path='/' element={<Main />} />
-                    <Route path='/category/:categoryId' element={<Main />} />
-                </Route>
+                    <Route element={<RequireAuth />}>
+                        <Route path='/' element={<Main />} />
+                        <Route path='/category/:categoryId' element={<Main />} />
+                    </Route>
 
-                <Route path='*' element={<NotFoundPage />} />
-            </Routes>
+                    <Route path='*' element={<NotFoundPage />} />
+                </Routes>
+            </ModalContext>
         </>
     )
 }

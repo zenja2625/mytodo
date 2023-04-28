@@ -7,12 +7,14 @@ export const Categories = () => {
 
     const className = 'categories' + (siderCollapsed ? ' hidden' : '')
 
+    
     return (
         <div className={className}>
             Categories:
             {categories.map(item => (
                 <CategoryItem key={item.id} {...item} />
             ))}
+            <button>Новая Категория</button>
         </div>
     )
 }
