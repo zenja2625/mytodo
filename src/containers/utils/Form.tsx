@@ -1,13 +1,13 @@
 import { useForm, FieldValues, Path, RegisterOptions } from 'react-hook-form'
 import { FormType } from './types'
 
-export const Form = <T extends FieldValues>({ fields, onSubmit }: FormType<T>) => {
+export const Form = <T extends FieldValues>({ fields, defaultValues, onSubmit }: FormType<T>) => {
     const {
         register,
         handleSubmit,
         getValues,
         formState: { errors, isSubmitting },
-    } = useForm<T>({ mode: 'onTouched' })
+    } = useForm<T>({ mode: 'onTouched', defaultValues })
 
     const items = (Object.keys(fields) as Array<Path<T>>).map(item => {
         const compareWith = fields[item]?.compareWith
@@ -37,7 +37,6 @@ export const Form = <T extends FieldValues>({ fields, onSubmit }: FormType<T>) =
             onSubmit={handleSubmit(onSubmit)}
         >
             {items}
-
             <input disabled={isSubmitting} type='submit' />
         </form>
     )
