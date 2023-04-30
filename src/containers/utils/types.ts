@@ -11,5 +11,5 @@ export type FormType<T extends FieldValues> = {
     defaultValues?: DeepPartial<T>
     fields: FormFieldsType<T>
     onSubmit: SubmitHandler<T>
+    onSuccessfulSubmit?: () => void
 }
-

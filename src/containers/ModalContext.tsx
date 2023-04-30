@@ -13,11 +13,17 @@ export const modalContext = createContext(initialState)
 export const ModalContext = ({ children }: PropsWithChildren) => {
     const [form, setForm] = useState<JSX.Element | null>(null)
 
-    const openModal = useCallback(<T extends FieldValues>(form: FormType<T>) => {
-        const formElement = <Form {...form} />
-
-        setForm(formElement)
+    const onSuccessfulSubmit = useCallback(() => {
+        setForm(null)
     }, [])
+
+    const openModal = useCallback(
+        <T extends FieldValues>(form: FormType<T>) => {
+            const formElement = <Form {...form} onSuccessfulSubmit={onSuccessfulSubmit} />
+            setForm(formElement)
+        },
+        [onSuccessfulSubmit]
+    )
 
     const value: typeof initialState = {
         openModal,

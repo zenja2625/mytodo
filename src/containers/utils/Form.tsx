@@ -1,13 +1,25 @@
-import { useForm, FieldValues, Path, RegisterOptions } from 'react-hook-form'
+import { useForm, FieldValues, Path, RegisterOptions, SubmitHandler } from 'react-hook-form'
 import { FormType } from './types'
+import { useEffect } from 'react'
 
-export const Form = <T extends FieldValues>({ fields, defaultValues, onSubmit }: FormType<T>) => {
+export const Form = <T extends FieldValues>({
+    fields,
+    defaultValues,
+    onSubmit,
+    onSuccessfulSubmit,
+}: FormType<T>) => {
     const {
         register,
         handleSubmit,
         getValues,
-        formState: { errors, isSubmitting },
+
+        formState: { errors, isSubmitting, isSubmitSuccessful, isDirty, isValid },
     } = useForm<T>({ mode: 'onTouched', defaultValues })
+
+    useEffect(() => {
+        if (isSubmitSuccessful) onSuccessfulSubmit?.()
+    }, [isSubmitSuccessful, onSuccessfulSubmit])
+
 
     const items = (Object.keys(fields) as Array<Path<T>>).map(item => {
         const compareWith = fields[item]?.compareWith
@@ -37,7 +49,7 @@ export const Form = <T extends FieldValues>({ fields, defaultValues, onSubmit }:
             onSubmit={handleSubmit(onSubmit)}
         >
             {items}
-            <input disabled={isSubmitting} type='submit' />
+            <input disabled={isSubmitting || !isDirty || !isValid} type='submit' />
         </form>
     )
 }

@@ -11,6 +11,9 @@ export const Login = () => {
 
     const onSubmit: SubmitHandler<UserLoginDTO> = useCallback(
         async data => {
+
+            console.log(data);
+            
             await dispath(loginThunk(data))
         },
         [dispath]
