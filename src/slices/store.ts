@@ -3,14 +3,14 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import { accountSlice } from "./accountSlice";
 import { appSlice } from "./appSlice";
 import { categoriesSlice } from "./categoriesSlice";
-// import { todosSlice } from "./slices/todosSlice";
+import { todosSlice } from "./todosSlice";
 
 export const store = configureStore({
   reducer: {
     app: appSlice.reducer,
     account: accountSlice.reducer,
     categories: categoriesSlice.reducer,
-    // todos: todosSlice.reducer,
+    todos: todosSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
