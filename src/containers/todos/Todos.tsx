@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../slices/store'
 import { clearTodos, getTodosThunk } from '../../slices/todosSlice'
@@ -7,9 +7,13 @@ import { CategoryParamsType } from '../types'
 import { toggleShowCompletedTodos } from '../../slices/categoriesSlice'
 import { LoadPage } from '../LoadPage'
 import { useLoadDelay } from '../../hooks/useLoadDelay'
+import { modalContext } from '../ModalContext'
+import { CreateTodoProps } from '../../slices/sliceTypes'
 
 export const Todos = () => {
     const { categoryId } = useParams<CategoryParamsType>()
+
+    const { openModal } = useContext(modalContext)
 
     const withCompleted = useAppSelector(state => state.categories.showCompletedTodos)
 
@@ -48,6 +52,21 @@ export const Todos = () => {
             {todos.map(item => (
                 <div key={item.id}>{item.value}</div>
             ))}
+
+            <button
+                // onClick={() => {
+                //     openModal({
+                //         onSubmit: (data: CreateTodoProps) => {
+
+                //         },
+                //         fields: {
+
+                //         }
+                //     })
+                // }}
+            >
+                Add Item
+            </button>
         </div>
     )
 }
