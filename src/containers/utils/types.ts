@@ -1,8 +1,9 @@
 import { DeepPartial, FieldValues, Path, RegisterOptions, SubmitHandler } from 'react-hook-form'
 
 export type FormFieldType<T extends FieldValues> = {
-    options: RegisterOptions<T, Path<T>>
+    options?: RegisterOptions<T, Path<T>>
     compareWith?: Path<T>
+    inputType?: 'date' 
 }
 
 export type FormFieldsType<T extends FieldValues> = Record<keyof T, FormFieldType<T>>

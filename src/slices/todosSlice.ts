@@ -15,6 +15,8 @@ import {
     OpenTodoEditorProps,
     DragStartType,
 } from './sliceTypes'
+import { getTodoPosition } from './utils/getTodoPosition'
+import { getTodoChildCount } from './utils/getTodoChildCount'
 
 const initialState: TodosType = {
     items: [],
@@ -70,7 +72,6 @@ export const updatePositionsThunk = createAsyncThunk<void, string, IState & Reje
         // try {
         //     const state = getState()
         //     const positions = state.todos.todoPositionDTOs
-
         //     if (positions.length) {
         //         dispatch(clearTodoPositions())
         //         await API.todos.updatePositions(payload, positions)
@@ -87,7 +88,6 @@ export const updateStatusesThunk = createAsyncThunk<void, string, IState & Rejec
         // try {
         //     const state = getState()
         //     const statuses = state.todos.todoStatusDTOs
-
         //     if (statuses.length) {
         //         dispatch(clearTodoStatuses())
         //         await API.todos.updateStatuses(payload, statuses)
@@ -101,39 +101,19 @@ export const updateStatusesThunk = createAsyncThunk<void, string, IState & Rejec
 export const createTodoThunk = createAsyncThunk<void, CreateTodoProps, IState & RejectValueType>(
     'todos/createTodoThunk',
     async (payload, { getState, rejectWithValue, dispatch }) => {
-        // try {
-        //     const todos = getState().todos.items
-        //     const withCompleted = getState().categories.showCompletedTodos
+        try {
+            const todos = getState().todos.items
+            const withCompleted = getState().categories.showCompletedTodos
 
-        //     let depth = 0
-        //     let prevIndex: number
-
-        //     if (payload.overId) {
-        //         const overIndex = todos.findIndex(todo => todo.id === payload.overId)
-
-        //         if (overIndex === -1) {
-        //             dispatch(deinitialization())
-        //             return
-        //         }
-
-        //         prevIndex = payload.addBefore ? overIndex - 1 : overIndex
-
-        //         if (prevIndex !== -1) {
-        //             depth = todos[overIndex].depth
-        //         }
-        //     } else {
-        //         prevIndex = todos.length - 1
-        //     }
-
-        //     await API.todos.createTodo(payload.categoryId, {
-        //         value: payload.todoValue.value,
-        //         taskEnd: payload.todoValue.taskEnd,
-        //         ...getTodoPosition(todos, prevIndex, depth),
-        //     })
-        //     await dispatch(getTodosThunk({ categoryId: payload.categoryId, withCompleted }))
-        // } catch (error: any) {
-        //     return rejectWithValue(error.response?.status)
-        // }
+            await API.todos.createTodo(payload.categoryId, {
+                value: payload.value,
+                taskEnd: payload.taskEnd,
+                ...getTodoPosition(todos, payload.overId, payload.addBefore),
+            })
+            await dispatch(getTodosThunk({ categoryId: payload.categoryId, withCompleted }))
+        } catch (error: any) {
+            return rejectWithValue(error.response?.status)
+        }
     }
 )
 
@@ -177,25 +157,20 @@ export const todosSlice = createSlice({
         toggleTodoProgress: (state, action: PayloadAction<string>) => {
             // const todos = state.items
             // const index = todos.findIndex(todo => todo.id === action.payload)
-
             // if (index !== -1) {
             //     const isDone = !todos[index].isDone
-
             //     if (isDone) {
             //         const childrenCount = getTodoChildCount(todos, index)
-
             //         for (let i = index + 1; i < todos.length && i <= index + childrenCount; i++) {
             //             todos[i].isDone = true
             //         }
             //     } else {
             //         let parentIndex = getParentIndex(todos, index)
-
             //         while (parentIndex !== -1) {
             //             todos[parentIndex].isDone = false
             //             parentIndex = getParentIndex(todos, parentIndex)
             //         }
             //     }
-
             //     todos[index].isDone = isDone
             //     state.todoStatusDTOs.push({
             //         id: todos[index].id,
@@ -244,37 +219,28 @@ export const todosSlice = createSlice({
             */
             // const todos = state.items
             // const { id, overId, actualDepth } = action.payload
-
             // const activeIndex = todos.findIndex(todo => todo.id.toString() === id)
             // const overIndex = todos.findIndex(todo => todo.id.toString() === overId)
-
             // const depth = getTodoDepth(todos, activeIndex, overIndex, actualDepth)
             // const prevIndex = activeIndex >= overIndex ? overIndex - 1 : overIndex
-
             // if (
             //     todos[prevIndex]?.id === todos[activeIndex - 1]?.id &&
             //     todos[activeIndex].depth === depth
             // )
             //     return
-
             // state.todoPositionDTOs.push({
             //     id: todos[activeIndex].id,
             //     ...getTodoPosition(todos, prevIndex, depth, activeIndex),
             // })
-
             // let todoChildrenCount = 0
-
             // for (let i = activeIndex + 1; i < todos.length; i++) {
             //     if (todos[i].depth > todos[activeIndex].depth) {
             //         todoChildrenCount++
             //         todos[i].depth += depth - todos[activeIndex].depth
             //     } else break
             // }
-
             // todos[activeIndex].depth = depth
-
             // const spliceTodos = todos.splice(activeIndex, todoChildrenCount + 1)
-
             // if (activeIndex < overIndex) {
             //     const toIndex = overIndex - todoChildrenCount
             //     todos.splice(toIndex < 0 ? -1 : toIndex, 0, ...spliceTodos)
@@ -287,7 +253,6 @@ export const todosSlice = createSlice({
         },
         openTodoEditor: (state, action: PayloadAction<OpenTodoEditorProps | undefined>) => {
             // const { value, ...payload } = action.payload || {}
-
             // state.todoEditor = {
             //     isOpen: true,
             //     value: value ? value : { value: '' },
@@ -324,8 +289,8 @@ export const todosSlice = createSlice({
             })
             .addCase(deleteTodoThunk.fulfilled, (state, action) => {
                 const todoIndex = state.items.findIndex(todo => todo.id === action.payload)
-                // const count = getTodoChildCount(state.items, todoIndex)
-                // state.items.splice(todoIndex, 1 + count)
+                const count = getTodoChildCount(state.items, todoIndex)
+                state.items.splice(todoIndex, 1 + count)
             })
     },
 })

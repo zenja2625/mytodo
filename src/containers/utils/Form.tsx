@@ -1,4 +1,4 @@
-import { useForm, FieldValues, Path, RegisterOptions, SubmitHandler } from 'react-hook-form'
+import { useForm, FieldValues, Path, RegisterOptions } from 'react-hook-form'
 import { FormType } from './types'
 import { useEffect } from 'react'
 
@@ -20,11 +20,10 @@ export const Form = <T extends FieldValues>({
         if (isSubmitSuccessful) onSuccessfulSubmit?.()
     }, [isSubmitSuccessful, onSuccessfulSubmit])
 
-
     const items = (Object.keys(fields) as Array<Path<T>>).map(item => {
         const compareWith = fields[item]?.compareWith
 
-        const options: RegisterOptions<T, Path<T>> = compareWith
+        const options: RegisterOptions<T, Path<T>> | undefined = compareWith
             ? {
                   ...fields[item].options,
                   validate: value => {
@@ -36,7 +35,12 @@ export const Form = <T extends FieldValues>({
         return (
             <div key={item}>
                 <>
-                    <input {...register(item, options)} />
+                    {fields[item].inputType === 'date' ? (
+                        <input type='date' {...register(item, options)} />
+                    ) : (
+                        <input {...register(item, options)} />
+                    )}
+
                     {errors[item]?.message}
                 </>
             </div>

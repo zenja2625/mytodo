@@ -4,14 +4,10 @@ import { RootState } from './store'
 import { Moment } from 'moment'
 // import { Coors } from '../Tree/types'
 
-
-
 export type Coors = {
     x: number
     y: number
 }
-
-
 
 export type AppType = {
     initialized: boolean
@@ -29,12 +25,15 @@ export type Category = {
     name: string
 }
 
-export interface TodoDTO {
+export interface ITodo {
     id: string
+    depth: number
+}
+
+export interface TodoDTO extends ITodo {
     value: string
     isDone: boolean
     isOpen: boolean
-    depth: number
     taskEnd?: Moment
 }
 
@@ -117,6 +116,8 @@ export type CreateTodoProps = {
     // todoValue: TodoEditorValueType
     overId?: string
     addBefore?: boolean
+    value: string
+    taskEnd?: Moment
 }
 
 export type updateTodoDragDepthProps = {

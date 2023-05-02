@@ -39,7 +39,7 @@ export const stringToMoment = (body: any) => {
             body['isOpen'] = !value
         } else if (key === 'id' && typeof value === 'number') {
             body[key] = value.toString()
-        } else if (typeof value === 'string') {
+        } else if (typeof value === 'string' && key === 'taskEnd') {
             const date = moment(value, true)
 
             if (date.isValid()) body[key] = date

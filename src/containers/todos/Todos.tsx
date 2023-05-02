@@ -1,7 +1,12 @@
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../slices/store'
-import { clearTodos, getTodosThunk } from '../../slices/todosSlice'
+import {
+    clearTodos,
+    createTodoThunk,
+    deleteTodoThunk,
+    getTodosThunk,
+} from '../../slices/todosSlice'
 import { getTodos } from '../../selectors/getTodos'
 import { CategoryParamsType } from '../types'
 import { toggleShowCompletedTodos } from '../../slices/categoriesSlice'
@@ -9,6 +14,10 @@ import { LoadPage } from '../LoadPage'
 import { useLoadDelay } from '../../hooks/useLoadDelay'
 import { modalContext } from '../ModalContext'
 import { CreateTodoProps } from '../../slices/sliceTypes'
+import moment, { Moment } from 'moment'
+import { serverDateFormat } from '../../dateFormat'
+import { TodoItem } from './TodoItem'
+import { TodoEditValue } from './types'
 
 export const Todos = () => {
     const { categoryId } = useParams<CategoryParamsType>()
@@ -41,6 +50,9 @@ export const Todos = () => {
 
     if (!selectedCategory) return <div className='todos'>Take Category</div>
 
+    console.log(todos);
+    
+
     return (
         <div className='todos'>
             {selectedCategory.name}
@@ -50,20 +62,35 @@ export const Todos = () => {
             {todosRequestId}
 
             {todos.map(item => (
-                <div key={item.id}>{item.value}</div>
+                <TodoItem key={item.id} item={item} categoryId={selectedCategory.id} />
             ))}
 
             <button
-                // onClick={() => {
-                //     openModal({
-                //         onSubmit: (data: CreateTodoProps) => {
+                onClick={() => {
+                    openModal({
+                        onSubmit: async (data: TodoEditValue) => {
+                            if (categoryId) {
+                                data.taskEnd = data.taskEnd
+                                    ? moment(data.taskEnd, serverDateFormat)
+                                    : undefined
 
-                //         },
-                //         fields: {
-
-                //         }
-                //     })
-                // }}
+                                await dispatch(
+                                    createTodoThunk({ categoryId: selectedCategory.id, ...data })
+                                )
+                            }
+                        },
+                        fields: {
+                            value: {
+                                options: {
+                                    required: true,
+                                },
+                            },
+                            taskEnd: {
+                                inputType: 'date',
+                            },
+                        },
+                    })
+                }}
             >
                 Add Item
             </button>
