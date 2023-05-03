@@ -1,3 +1,8 @@
+#root {
+    display: flex;
+    flex-direction: column;
+}
+
 .header {
     height: 60px;
     background-color: orange;
@@ -7,7 +12,7 @@
 
 main {
     display: flex;
-    height: 100%;
+    flex-grow: 1;
 }
 
 .categories {

@@ -18,6 +18,7 @@ import moment, { Moment } from 'moment'
 import { serverDateFormat } from '../../dateFormat'
 import { TodoItem } from './TodoItem'
 import { TodoEditValue } from './types'
+import { SortableTree } from '../sortableTree/SortableTree'
 
 export const Todos = () => {
     const { categoryId } = useParams<CategoryParamsType>()
@@ -50,12 +51,17 @@ export const Todos = () => {
 
     if (!selectedCategory) return <div className='todos'>Take Category</div>
 
-    console.log(todos);
-    
-
     return (
         <div className='todos'>
-            {selectedCategory.name}
+            <SortableTree
+                items={todos}
+                itemHeight={40}
+                renderItem={() => <div></div>}
+                renderOverlay={() => <div></div>}
+                onDrop={() => {}}
+            />
+
+            {/* {selectedCategory.name}
             <button onClick={() => dispatch(toggleShowCompletedTodos())}>
                 {withCompleted.toString()}
             </button>
@@ -93,7 +99,7 @@ export const Todos = () => {
                 }}
             >
                 Add Item
-            </button>
+            </button> */}
         </div>
     )
 }
