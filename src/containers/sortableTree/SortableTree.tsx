@@ -1,4 +1,13 @@
-import { createContext, useEffect, useLayoutEffect, useRef, useState, memo } from 'react'
+import {
+    createContext,
+    useEffect,
+    useLayoutEffect,
+    useRef,
+    useState,
+    memo,
+    useMemo,
+    useCallback,
+} from 'react'
 import {
     FixedSizeList as List,
     ListChildComponentProps,
@@ -6,6 +15,7 @@ import {
     areEqual,
 } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
+import { TodoItem } from '../todos/TodoItem'
 
 type TreeItem = {
     id: string
@@ -39,6 +49,16 @@ export const Row = memo(({ index, style, data, isScrolling }: ListChildComponent
 
 const context = createContext('light')
 
+const skipDragItems = <T extends TreeItem>(items: Array<T>, index: number) => {
+    const array = [...items]
+
+    for (let i = index + 1; i <= items.length; i++)
+        if (i >= items.length || items[index].depth >= items[i].depth)
+            array.splice(index, i - index)
+
+    return array
+}
+
 export const SortableTree = <T extends TreeItem>({
     items,
     itemDepthWidth = 30,
@@ -49,10 +69,16 @@ export const SortableTree = <T extends TreeItem>({
     renderItem,
 }: SortableTreeProps<T>) => {
     const [count, setCount] = useState(0)
+    const [activeIndex, setActiveIndex] = useState(-1)
+    const [overIndex, setOverIndex] = useState(-1)
+    const [depth, setDepth] = useState(0)
 
-    const getItem = (index: number) => {
+    const order = useMemo(
+        () => (activeIndex !== -1 ? items : skipDragItems(items, activeIndex)),
+        [items, activeIndex]
+    )
 
-    }
+    const getItem = useCallback((index: number) => renderItem(order[index]), [order, renderItem])
 
     return (
         <div
@@ -73,8 +99,6 @@ export const SortableTree = <T extends TreeItem>({
             >
                 Click {count}
             </button>
-
-            
 
             <context.Provider value='asd'>
                 <AutoSizer>
