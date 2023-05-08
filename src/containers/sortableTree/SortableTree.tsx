@@ -43,7 +43,6 @@ export const Row = memo(
         const rowElement = useMemo(() => getItem(index, handleProps), [index, handleProps, getItem])
 
         useEffect(() => {
-            // console.log(`Scroll Change`)
         })
 
         useLayoutEffect(() => {
@@ -220,7 +219,15 @@ export const SortableTree = <T extends TreeItem>({
             >
                 Click {count}
             </button>
-
+            <div
+                style={{
+                    position: 'fixed',
+                    bottom: 0,
+                    left: 0,
+                }}
+            >
+                {activeIndex} {overIndex}
+            </div>
             <context.Provider value='asd'>
                 <innerElementContext.Provider value={value}>
                     <AutoSizer>

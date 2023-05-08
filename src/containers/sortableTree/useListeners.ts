@@ -4,69 +4,65 @@ import { Coors } from './types'
 
 export const useListeners = (
     isActive: boolean,
-    setCoors: (coors: Coors) => void,
-    dragEnd?: () => void,
+    onMove: (coors: Coors) => void,
+    onEnd?: () => void,
     onCancel?: () => void
 ) => {
+    const touchMoveStartRef = useRef(false)
     const touchTargetRef = useRef<EventTarget | null>(null)
 
-    const onMove = useCallback(
-        (event: Event) => {
-            setCoors(getCoordinates(event))
+    const onMoveEvent = useCallback(
+        (e: Event) => {
+            e.preventDefault()
+            onMove(getCoordinates(e))
         },
-        [setCoors]
+        [onMove]
     )
 
-    const cancel = useCallback(
+    const onKeyboardEvent = useCallback(
         (e: KeyboardEvent) => {
             if (e.key === 'Escape' && onCancel) onCancel()
         },
         [onCancel]
     )
 
-    const touchEnd = useCallback(
+    const onEndEvent = useCallback(
         (e: Event) => {
             e.preventDefault()
-            touchTargetRef.current = null
-            dragEnd?.()
+            onEnd?.()
         },
-        [dragEnd]
+        [onEnd]
     )
-
-    const touchStart = useCallback(
-        (e: TouchEvent) => {
-            touchTargetRef.current = e.target
-            // e.target?.addEventListener("touchmove", function(event) {
-            //     event.preventDefault();
-            //   }, false);
-            // e.target?.addEventListener('touchmove', onMove)
-            // e.target?.addEventListener('touchend', touchEnd)
-        },
-        [onMove, touchEnd]
-    )
+    
+    const onTouchStartEvent = useCallback((e: TouchEvent) => {
+        if (!touchMoveStartRef.current) touchTargetRef.current = e.target
+        else e.stopPropagation()
+    }, [])
 
     useEffect(() => {
-        window.addEventListener('touchstart', touchStart)
+        window.addEventListener('touchstart', onTouchStartEvent, { capture: true, passive: false })
 
         if (isActive) {
-            window.addEventListener('mousemove', onMove)
-            // window.addEventListener('touchstart', touchStart)
-            window.addEventListener('keydown', cancel)
-            dragEnd && window.addEventListener('mouseup', dragEnd)
+            window.addEventListener('mousemove', onMoveEvent)
+            window.addEventListener('keydown', onKeyboardEvent)
+            window.addEventListener('mouseup', onEndEvent)
             if (touchTargetRef.current) {
-                touchTargetRef.current.addEventListener('touchmove', onMove)
-                touchTargetRef.current.addEventListener('touchend', touchEnd)
+                touchMoveStartRef.current = true
+                touchTargetRef.current.addEventListener('touchmove', onMoveEvent)
+                touchTargetRef.current.addEventListener('touchend', onEndEvent)
             }
+        } else {
+            touchMoveStartRef.current = false
         }
         return () => {
-            window.removeEventListener('mousemove', onMove)
-            window.removeEventListener('touchstart', touchStart)
-            window.removeEventListener('keydown', cancel)
-            dragEnd && window.removeEventListener('mouseup', dragEnd)
+            window.removeEventListener('mousemove', onMoveEvent)
+            window.removeEventListener('touchstart', onTouchStartEvent)
+            window.removeEventListener('keydown', onKeyboardEvent)
+            window.removeEventListener('mouseup', onEndEvent)
             if (touchTargetRef.current) {
-                touchTargetRef.current.removeEventListener('touchmove', onMove)
-                touchTargetRef.current.removeEventListener('touchend', touchEnd)
+                touchTargetRef.current.removeEventListener('touchmove', onMoveEvent)
+                touchTargetRef.current.removeEventListener('touchend', onEndEvent)
             }
         }
-    }, [isActive, onMove, dragEnd, cancel, touchStart, touchEnd])
+    }, [isActive, onMoveEvent, onKeyboardEvent, onTouchStartEvent, onEndEvent])
 }
