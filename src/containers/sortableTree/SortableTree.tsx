@@ -16,39 +16,51 @@ import {
     ListChildComponentProps,
     ReactElementType,
     areEqual,
+    FixedSizeListProps,
 } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { TodoItem } from '../todos/TodoItem'
 import Context from 'react-redux/es/components/Context'
-import { InnerElementContext, RowProps, TreeItem } from './types'
+import {
+    DragHandleProps,
+    InnerElementContext,
+    RowProps,
+    SortableTreeProps,
+    TreeItem,
+} from './types'
 import { useDnd } from './useDnd'
 
-type SortableTreeProps<T extends TreeItem> = {
-    items: Array<T>
-    itemDepthWidth?: number
-    itemHeight: number
-    gap?: number
-    maxDepth?: number
-    header?: JSX.Element
-    footer?: JSX.Element
-    renderItem: (item: T) => JSX.Element
-    renderOverlay: (item: T) => JSX.Element
-    onDrop: (activeId: string, overId: string) => void
-}
+export const Row = memo(
+    <T extends TreeItem>({ index, style, data }: ListChildComponentProps<RowProps<T>>) => {
+        const { activeIndex, order, getHandleProps, getItem, getRowStyle } = data
 
-export const Row = memo(<T extends TreeItem>({ index, style, data, isScrolling }: ListChildComponentProps<RowProps<T>>) => {
-    const ref = useRef(0)
+        const ref = useRef(0)
 
-    useEffect(() => {
-        console.log(`Scroll Change`)
-    })
+        const id = order[index].id
 
-    useLayoutEffect(() => {
-        ref.current++
-    })
+        const handleProps = useMemo(() => getHandleProps(id), [getHandleProps, id])
 
-    return <div style={style}>SortableTreeInside{ref.current}</div>
-}, areEqual)
+        const rowElement = useMemo(() => getItem(index, handleProps), [index, handleProps, getItem])
+
+        useEffect(() => {
+            // console.log(`Scroll Change`)
+        })
+
+        useLayoutEffect(() => {
+            ref.current++
+        })
+
+        if (activeIndex === index) return null
+
+        return (
+            <div style={{ ...getRowStyle(index, style), display: 'flex', alignItems: 'center' }}>
+                {rowElement}
+                <div style={{ position: 'absolute', right: 0 }}>{ref.current} </div>
+            </div>
+        )
+    },
+    areEqual
+)
 
 const context = createContext('light')
 const innerElementInitialValue: InnerElementContext = {
@@ -59,7 +71,7 @@ const innerElementInitialValue: InnerElementContext = {
 }
 const innerElementContext = createContext(innerElementInitialValue)
 
-const innerElementType: ReactElementType = forwardRef<
+const InnerElementType: ReactElementType = forwardRef<
     HTMLDivElement,
     { style: CSSProperties; children: JSX.Element }
 >(({ children, ...rest }, ref) => {
@@ -130,11 +142,9 @@ export const SortableTree = <T extends TreeItem>({
         gap,
         innerRef.current,
         items,
-        5,
+        maxDepth,
         itemDepthWidth
     )
-
-    const getItem = useCallback((index: number) => renderItem(order[index]), [order, renderItem])
 
     const value: InnerElementContext = useMemo(
         () =>
@@ -149,7 +159,47 @@ export const SortableTree = <T extends TreeItem>({
         [activeIndex, overIndex, depth, itemDepthWidth, itemHeight, gap]
     )
 
-    const rowData: RowProps<T> = useMemo(() => ({ renderItem }), [renderItem])
+    const getRowStyle = useCallback(
+        (index: number, style: React.CSSProperties) => {
+            const rowStyle = {
+                ...style,
+                left: order[index].depth * itemDepthWidth,
+                right: 0,
+                width: undefined,
+            }
+
+            if (activeIndex !== -1) {
+                rowStyle.top =
+                    index > activeIndex && index <= overIndex
+                        ? (index - 1) * (itemHeight + gap)
+                        : index < activeIndex && index >= overIndex
+                        ? (index + 1) * (itemHeight + gap)
+                        : style.top
+            }
+
+            return rowStyle
+        },
+        [activeIndex, overIndex, order, itemHeight, gap, itemDepthWidth]
+    )
+
+    const getHandleProps = useCallback(
+        (id: string) => ({
+            onTouchStart: dragStart(id),
+            onMouseDown: dragStart(id),
+        }),
+        [dragStart]
+    )
+    const getItem = useCallback(
+        (index: number, handleProps: DragHandleProps) => renderItem(order[index], handleProps),
+        [order, renderItem]
+    )
+
+    const rowData: RowProps<T> = useMemo(
+        () => ({ activeIndex, order, getItem, getRowStyle, getHandleProps }),
+        [activeIndex, order, getItem, getRowStyle, getHandleProps]
+    )
+
+    const setItemKey = useCallback((index: number, data: RowProps<T>) => data.order[index].id, [])
 
     return (
         <div
@@ -178,13 +228,14 @@ export const SortableTree = <T extends TreeItem>({
                             <List
                                 height={height || 0}
                                 width={width || 0}
-                                itemCount={items.length}
+                                itemCount={order.length}
                                 itemSize={itemHeight + gap}
                                 itemData={rowData}
                                 useIsScrolling={false}
                                 overscanCount={30}
+                                innerElementType={InnerElementType}
                                 innerRef={innerRef}
-                                
+                                itemKey={setItemKey}
                             >
                                 {Row}
                             </List>

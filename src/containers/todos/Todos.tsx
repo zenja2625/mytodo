@@ -19,6 +19,7 @@ import { serverDateFormat } from '../../dateFormat'
 import { TodoItem } from './TodoItem'
 import { TodoEditValue } from './types'
 import { SortableTree } from '../sortableTree/SortableTree'
+import { TodoItem1 } from './TodoItem1'
 
 export const Todos = () => {
     const { categoryId } = useParams<CategoryParamsType>()
@@ -56,7 +57,9 @@ export const Todos = () => {
             <SortableTree
                 items={todos}
                 itemHeight={40}
-                renderItem={() => <div></div>}
+                renderItem={(item, handleProps) => (
+                    <TodoItem1 item={item} handleProps={handleProps} />
+                )}
                 renderOverlay={() => <div></div>}
                 onDrop={() => {}}
             />

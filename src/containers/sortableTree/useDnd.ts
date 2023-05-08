@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getCoordinates } from './getCoordinates'
 import { getLimitValue } from './getLimitValue'
 import { skipDragItems } from './skipDragItems'
@@ -13,24 +13,33 @@ export const useDnd = <T extends TreeItem>(
     maxDepth: number,
     depthWidth: number
 ) => {
+    const itemsRef = useRef(items)
+
     const [activeIndex, setActiveIndex] = useState(-1)
     const [overIndex, setOverIndex] = useState(-1)
     const [depth, setDepth] = useState(0)
     const [initialPosition, setInitialPosition] = useState({ x: 0, y: 0 })
 
+    useEffect(() => {
+        itemsRef.current = items
+    }, [items])
+
+    const order = useMemo(
+        () => (activeIndex !== -1 ? skipDragItems(items, activeIndex) : items),
+        [items, activeIndex]
+    )
+
     const shift = useMemo((): Coors => {
         const { x = 0, y = 0 } = wrapper?.getBoundingClientRect() || {}
 
-        return {
-            x: initialPosition.x - x - items[activeIndex].depth * depthWidth,
-            y: initialPosition.y - y - (height + gap) * activeIndex,
-        }
-    }, [initialPosition, activeIndex, items, depthWidth, wrapper, height, gap])
+        return activeIndex !== -1
+            ? {
+                  x: initialPosition.x - x - order[activeIndex].depth * depthWidth,
+                  y: initialPosition.y - y - (height + gap) * activeIndex,
+              }
+            : { x: 0, y: 0 }
+    }, [initialPosition, activeIndex, order, depthWidth, wrapper, height, gap])
 
-    const order = useMemo(
-        () => (activeIndex !== -1 ? items : skipDragItems(items, activeIndex)),
-        [items, activeIndex]
-    )
     const onMove = useCallback(
         ({ x, y }: Coors) => {
             const { x: dx = 0, y: dy = 0 } = wrapper?.getBoundingClientRect() || {}
@@ -40,22 +49,22 @@ export const useDnd = <T extends TreeItem>(
                 offsetY / (height + gap) - overIndex,
                 overIndex,
                 0.5 - gap / (height + gap) / 2,
-                items.length - 1
+                order.length - 1
             )
 
             const prevIndex = activeIndex >= index ? index - 1 : index
             const nextIndex = activeIndex <= index ? index + 1 : index
 
-            const prevDepth = items[prevIndex]?.depth + 1 || 0
+            const prevDepth = order[prevIndex]?.depth + 1 || 0
             const max = prevDepth > maxDepth ? maxDepth : prevDepth
-            const min = items[nextIndex]?.depth || 0
+            const min = order[nextIndex]?.depth || 0
 
             const offsetX = x - shift.x - dx
             const newDepth = getLimitValue(offsetX / depthWidth - depth, depth, 0.3, max, min)
             setOverIndex(index)
             setDepth(newDepth)
         },
-        [wrapper, height, gap, maxDepth, items, shift, depth, activeIndex, overIndex]
+        [wrapper, height, gap, maxDepth, order, depthWidth, shift, depth, activeIndex, overIndex]
     )
 
     const dragEnd = useCallback(() => {
@@ -68,22 +77,29 @@ export const useDnd = <T extends TreeItem>(
         //     })
         // )
         setActiveIndex(-1)
-    }, [depth, activeIndex, overIndex, items])
+    }, [])
 
     useListeners(activeIndex !== -1, onMove, dragEnd)
 
     const dragStart = useCallback(
-        (activeIndex: number, depth: number) => (e: React.MouseEvent | React.TouchEvent) => {
+        (id: string) => (e: React.MouseEvent | React.TouchEvent) => {
             // console.log(e);
 
             // e.preventDefault()
-            document.body.style.cursor = 'move'
             // document.body.style.scrollBehavior = 'hidden'
-            const initialPosition = getCoordinates(e.nativeEvent)
-            setActiveIndex(activeIndex)
-            setOverIndex(activeIndex)
-            setDepth(depth)
-            setInitialPosition(initialPosition)
+
+            const index = itemsRef.current.findIndex(item => item.id === id)
+
+            if (index !== -1) {
+                const initialPosition = getCoordinates(e.nativeEvent)
+
+                setActiveIndex(index)
+                setOverIndex(index)
+                setDepth(itemsRef.current[index].depth)
+                setInitialPosition(initialPosition)
+
+                document.body.style.cursor = 'move'
+            }
         },
         []
     )
