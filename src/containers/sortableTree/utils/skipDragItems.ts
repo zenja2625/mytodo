@@ -1,4 +1,4 @@
-import { TreeItem } from './types'
+import { TreeItem } from '../types'
 
 export const skipDragItems = <T extends TreeItem>(items: Array<T>, index: number) => {
     for (let i = index + 1; i < items.length; i++)

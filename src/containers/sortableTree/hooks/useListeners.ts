@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react'
-import { getCoordinates } from './getCoordinates'
-import { Coors } from './types'
+import { getCoordinates } from '../utils/getCoordinates'
+import { Coors } from '../types'
 
 export const useListeners = (
     isActive: boolean,

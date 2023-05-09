@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { getCoordinates } from './getCoordinates'
-import { getLimitValue } from './getLimitValue'
-import { skipDragItems } from './skipDragItems'
-import { Coors, TreeItem } from './types'
+import { getCoordinates } from '../utils/getCoordinates'
+import { getLimitValue } from '../utils/getLimitValue'
+import { skipDragItems } from '../utils/skipDragItems'
+import { Coors, TreeItem } from '../types'
 import { useListeners } from './useListeners'
 
 export const useDnd = <T extends TreeItem>(
@@ -69,6 +69,8 @@ export const useDnd = <T extends TreeItem>(
 
     const dragEnd = useCallback(() => {
         document.body.style.cursor = ''
+        document.body.style.scrollBehavior = ''
+
         // appDispath(
         //     moveTodo({
         //         id: items[activeIndex].id,
@@ -83,11 +85,6 @@ export const useDnd = <T extends TreeItem>(
 
     const dragStart = useCallback(
         (id: string) => (e: React.MouseEvent | React.TouchEvent) => {
-            // console.log(e);
-
-            // e.preventDefault()
-            // document.body.style.scrollBehavior = 'hidden'
-
             const index = itemsRef.current.findIndex(item => item.id === id)
 
             if (index !== -1) {
@@ -99,6 +96,7 @@ export const useDnd = <T extends TreeItem>(
                 setInitialPosition(initialPosition)
 
                 document.body.style.cursor = 'move'
+                document.body.style.scrollBehavior = 'hidden'
             }
         },
         []

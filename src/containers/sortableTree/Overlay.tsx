@@ -1,6 +1,6 @@
 import { FC, useMemo, useState, CSSProperties, memo } from 'react'
 import { OverlayProps } from './types'
-import { useListeners } from './useListeners'
+import { useListeners } from './hooks/useListeners'
 
 export const Overlay: FC<OverlayProps> = memo(
     ({ shift, initialPosition, width, height, children }) => {

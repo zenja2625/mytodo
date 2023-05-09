@@ -64,12 +64,7 @@ export const Todos = () => {
                 renderOverlay={item => <TodoItem1 item={item} />}
                 onDrop={() => {}}
             />
-            <div
-                style={{
-                    position: 'absolute',
-                    bottom: 0,
-                }}
-            ></div>
+
             {/* {selectedCategory.name}
             <button onClick={() => dispatch(toggleShowCompletedTodos())}>
                 {withCompleted.toString()}
