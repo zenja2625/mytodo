@@ -3,8 +3,8 @@ import { Todo } from '../../slices/sliceTypes'
 import { DragHandleProps } from '../sortableTree/types'
 import { areEqual } from 'react-window'
 
-export const TodoItem1: FC<{ item: Todo; handleProps: DragHandleProps }> = memo(
-    ({ handleProps, item }) => {
+export const TodoItem1: FC<{ item: Todo; handleProps?: DragHandleProps}> =
+    memo(({ handleProps, item, }) => {
         const ref = useRef(0)
 
         useLayoutEffect(() => {
@@ -13,7 +13,7 @@ export const TodoItem1: FC<{ item: Todo; handleProps: DragHandleProps }> = memo(
 
         // useEffect(() => {
         //     console.log('Update ');
-            
+
         // }, [item])
 
         return (
@@ -21,7 +21,7 @@ export const TodoItem1: FC<{ item: Todo; handleProps: DragHandleProps }> = memo(
                 {...handleProps}
                 style={{
                     backgroundColor: 'red',
-                    height: '100%',
+                    height: `100%`,
                     width: '100%',
                 }}
             >
@@ -31,6 +31,4 @@ export const TodoItem1: FC<{ item: Todo; handleProps: DragHandleProps }> = memo(
                 </div>
             </div>
         )
-    },
-    areEqual
-)
+    }, areEqual)

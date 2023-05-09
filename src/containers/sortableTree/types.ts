@@ -24,8 +24,6 @@ export type RowProps<T extends TreeItem> = {
     getHandleProps: (id: string) => DragHandleProps
     activeIndex: number
     order: Array<T>
-
-    // getHandleProps: (index: number) => DragHandleProps
 }
 
 export type InnerElementContext = {
@@ -40,4 +38,12 @@ export type InnerElementContext = {
 export type TreeItem = {
     id: string
     depth: number
+}
+
+export type OverlayProps = {
+    width: number
+    height: number
+    shift: Coors
+    initialPosition: Coors
+    children: JSX.Element
 }

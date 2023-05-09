@@ -56,14 +56,20 @@ export const Todos = () => {
         <div className='todos'>
             <SortableTree
                 items={todos}
-                itemHeight={40}
+                itemHeight={44}
+                gap={10}
                 renderItem={(item, handleProps) => (
                     <TodoItem1 item={item} handleProps={handleProps} />
                 )}
-                renderOverlay={() => <div></div>}
+                renderOverlay={item => <TodoItem1 item={item} />}
                 onDrop={() => {}}
             />
-
+            <div
+                style={{
+                    position: 'absolute',
+                    bottom: 0,
+                }}
+            ></div>
             {/* {selectedCategory.name}
             <button onClick={() => dispatch(toggleShowCompletedTodos())}>
                 {withCompleted.toString()}

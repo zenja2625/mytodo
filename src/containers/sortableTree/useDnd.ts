@@ -104,5 +104,5 @@ export const useDnd = <T extends TreeItem>(
         []
     )
 
-    return { activeIndex, overIndex, depth, order, shift, dragStart }
+    return { activeIndex, overIndex, depth, order, shift, initialPosition, dragStart }
 }
