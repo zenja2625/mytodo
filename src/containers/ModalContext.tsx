@@ -40,6 +40,7 @@ export const ModalContext = ({ children }: PropsWithChildren) => {
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
+                        zIndex: 1000
                     }}
                 >
                     <div

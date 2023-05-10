@@ -17,6 +17,7 @@ import {
 } from './sliceTypes'
 import { getTodoPosition } from './utils/getTodoPosition'
 import { getTodoChildCount } from './utils/getTodoChildCount'
+import { getParentIndex } from './utils/getParentIndex'
 
 const initialState: TodosType = {
     items: [],
@@ -85,16 +86,16 @@ export const updatePositionsThunk = createAsyncThunk<void, string, IState & Reje
 export const updateStatusesThunk = createAsyncThunk<void, string, IState & RejectValueType>(
     'todos/updateStatusesThunk',
     async (payload, { getState, dispatch, rejectWithValue }) => {
-        // try {
-        //     const state = getState()
-        //     const statuses = state.todos.todoStatusDTOs
-        //     if (statuses.length) {
-        //         dispatch(clearTodoStatuses())
-        //         await API.todos.updateStatuses(payload, statuses)
-        //     }
-        // } catch (error: any) {
-        //     return rejectWithValue(error.response?.status)
-        // }
+        try {
+            const state = getState()
+            const statuses = state.todos.todoStatusDTOs
+            if (statuses.length) {
+                dispatch(clearTodoStatuses())
+                await API.todos.updateStatuses(payload, statuses)
+            }
+        } catch (error: any) {
+            return rejectWithValue(error.response?.status)
+        }
     }
 )
 
@@ -155,30 +156,30 @@ export const todosSlice = createSlice({
             state.todoPositionDTOs = []
         },
         toggleTodoProgress: (state, action: PayloadAction<string>) => {
-            // const todos = state.items
-            // const index = todos.findIndex(todo => todo.id === action.payload)
-            // if (index !== -1) {
-            //     const isDone = !todos[index].isDone
-            //     if (isDone) {
-            //         const childrenCount = getTodoChildCount(todos, index)
-            //         for (let i = index + 1; i < todos.length && i <= index + childrenCount; i++) {
-            //             todos[i].isDone = true
-            //         }
-            //     } else {
-            //         let parentIndex = getParentIndex(todos, index)
-            //         while (parentIndex !== -1) {
-            //             todos[parentIndex].isDone = false
-            //             parentIndex = getParentIndex(todos, parentIndex)
-            //         }
-            //     }
-            //     todos[index].isDone = isDone
-            //     state.todoStatusDTOs.push({
-            //         id: todos[index].id,
-            //         isDone,
-            //     })
-            // }
+            const todos = state.items
+            const index = todos.findIndex(todo => todo.id === action.payload)
+            if (index !== -1) {
+                const isDone = !todos[index].isDone
+                if (isDone) {
+                    const childrenCount = getTodoChildCount(todos, index)
+                    for (let i = index + 1; i < todos.length && i <= index + childrenCount; i++) {
+                        todos[i].isDone = true
+                    }
+                } else {
+                    let parentIndex = getParentIndex(todos, index)
+                    while (parentIndex !== -1) {
+                        todos[parentIndex].isDone = false
+                        parentIndex = getParentIndex(todos, parentIndex)
+                    }
+                }
+                todos[index].isDone = isDone
+                state.todoStatusDTOs.push({
+                    id: todos[index].id,
+                    isDone,
+                })
+            }
         },
-        toggleTodoHiding: (state, action: PayloadAction<string>) => {
+        toggleTodoCollapsed: (state, action: PayloadAction<string>) => {
             const todos = state.items
             const index = todos.findIndex(todo => todo.id === action.payload)
 
@@ -298,7 +299,7 @@ export const todosSlice = createSlice({
 export const {
     clearTodos,
     toggleTodoProgress,
-    toggleTodoHiding,
+    toggleTodoCollapsed,
     moveTodo,
     openTodoEditor,
     closeTodoEditor,

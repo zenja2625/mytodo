@@ -1,13 +1,23 @@
 import { FC, useContext, useState } from 'react'
 import { Todo } from '../../slices/sliceTypes'
-import { createTodoThunk, deleteTodoThunk, updateTodoThunk } from '../../slices/todosSlice'
+import {
+    createTodoThunk,
+    deleteTodoThunk,
+    toggleTodoCollapsed,
+    updateTodoThunk,
+} from '../../slices/todosSlice'
 import { useAppDispatch } from '../../slices/store'
 import moment from 'moment'
 import { serverDateFormat } from '../../dateFormat'
 import { modalContext } from '../ModalContext'
 import { TodoEditValue } from './types'
+import { DragHandleProps } from '../sortableTree/types'
 
-export const TodoItem: FC<{ item: Todo; categoryId: string }> = ({ item, categoryId }) => {
+export const TodoItem: FC<{ item: Todo; categoryId: string; handleProps?: DragHandleProps }> = ({
+    item,
+    categoryId,
+    handleProps,
+}) => {
     const [isLoad, setIsLoad] = useState(false)
 
     const { openModal } = useContext(modalContext)
@@ -63,8 +73,25 @@ export const TodoItem: FC<{ item: Todo; categoryId: string }> = ({ item, categor
     }
 
     return (
-        <div>
-            {item.value.toString()}
+        <div
+            style={{
+                backgroundColor: 'red',
+                height: '100%',
+                width: '100%',
+                userSelect: 'none',
+                display: 'flex',
+            }}
+        >
+            {item.showHideButton && (
+                <div
+                    onClick={() => {
+                        dispatch(toggleTodoCollapsed(item.id))
+                    }}
+                >
+                    {item.isOpen ? '🡫' : '>'}
+                </div>
+            )}
+            {item.value}
             {isLoad ? (
                 <span> Загрузкака...</span>
             ) : (

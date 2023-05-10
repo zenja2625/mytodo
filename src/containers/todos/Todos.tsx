@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../slices/store'
 import {
@@ -6,6 +6,7 @@ import {
     createTodoThunk,
     deleteTodoThunk,
     getTodosThunk,
+    updateStatusesThunk,
 } from '../../slices/todosSlice'
 import { getTodos } from '../../selectors/getTodos'
 import { CategoryParamsType } from '../types'
@@ -20,6 +21,8 @@ import { TodoItem } from './TodoItem'
 import { TodoEditValue } from './types'
 import { SortableTree } from '../sortableTree/SortableTree'
 import { TodoItem1 } from './TodoItem1'
+import { useDebounce } from '../../hooks/useDebounce'
+import { TodoStatusDTO } from '../../api/apiTypes'
 
 export const Todos = () => {
     const { categoryId } = useParams<CategoryParamsType>()
@@ -31,6 +34,8 @@ export const Todos = () => {
     const categories = useAppSelector(state => state.categories.items)
     const todosRequestId = useAppSelector(state => state.todos.todosRequestId)
 
+    const statuses = useAppSelector(state => state.todos.todoStatusDTOs)
+
     const todos = useAppSelector(getTodos)
     const dispatch = useAppDispatch()
 
@@ -40,6 +45,16 @@ export const Todos = () => {
         () => categories.find(category => category.id === categoryId),
         [categoryId, categories]
     )
+
+    const fetchStatuses = useCallback(
+        (statuses: TodoStatusDTO[]) => {
+            if (selectedCategory && statuses.length)
+                dispatch(updateStatusesThunk(selectedCategory.id))
+        },
+        [selectedCategory, dispatch]
+    )
+
+    useDebounce(statuses, 1000, fetchStatuses)
 
     useEffect(() => {
         const categoryId = selectedCategory?.id
@@ -59,7 +74,11 @@ export const Todos = () => {
                 itemHeight={44}
                 gap={10}
                 renderItem={(item, handleProps) => (
-                    <TodoItem1 item={item} handleProps={handleProps} />
+                    <TodoItem
+                        item={item}
+                        handleProps={handleProps}
+                        categoryId={selectedCategory.id}
+                    />
                 )}
                 renderOverlay={item => <TodoItem1 item={item} />}
                 onDrop={() => {}}
