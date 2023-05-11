@@ -26,8 +26,8 @@ export type TodoStatusDTO = {
 }
 export type TodoPositionDTO = {
     id: string,
-    parentId: string,
-    prevTodoId: string
+    parentId?: string,
+    prevTodoId?: string
 }
 export type CategoryRequestDTO = {
     name: string

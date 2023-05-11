@@ -6,6 +6,7 @@ import {
     createTodoThunk,
     deleteTodoThunk,
     getTodosThunk,
+    updatePositionsThunk,
     updateStatusesThunk,
 } from '../../slices/todosSlice'
 import { getTodos } from '../../selectors/getTodos'
@@ -22,7 +23,7 @@ import { TodoEditValue } from './types'
 import { SortableTree } from '../sortableTree/SortableTree'
 import { TodoItem1 } from './TodoItem1'
 import { useDebounce } from '../../hooks/useDebounce'
-import { TodoStatusDTO } from '../../api/apiTypes'
+import { TodoPositionDTO, TodoStatusDTO } from '../../api/apiTypes'
 
 export const Todos = () => {
     const { categoryId } = useParams<CategoryParamsType>()
@@ -35,6 +36,7 @@ export const Todos = () => {
     const todosRequestId = useAppSelector(state => state.todos.todosRequestId)
 
     const statuses = useAppSelector(state => state.todos.todoStatusDTOs)
+    const positions = useAppSelector(state => state.todos.todoPositionDTOs)
 
     const todos = useAppSelector(getTodos)
     const dispatch = useAppDispatch()
@@ -46,15 +48,24 @@ export const Todos = () => {
         [categoryId, categories]
     )
 
+    const fetchPositions = useCallback(
+        (positions: Array<TodoPositionDTO>) => {
+            if (selectedCategory && positions.length)
+                dispatch(updatePositionsThunk(selectedCategory.id))
+        },
+        [selectedCategory, dispatch]
+    )
+
     const fetchStatuses = useCallback(
-        (statuses: TodoStatusDTO[]) => {
+        (statuses: Array<TodoStatusDTO>) => {
             if (selectedCategory && statuses.length)
                 dispatch(updateStatusesThunk(selectedCategory.id))
         },
         [selectedCategory, dispatch]
     )
 
-    useDebounce(statuses, 1000, fetchStatuses)
+    useDebounce(statuses, 200, fetchStatuses)
+    useDebounce(positions, 200, fetchPositions)
 
     useEffect(() => {
         const categoryId = selectedCategory?.id

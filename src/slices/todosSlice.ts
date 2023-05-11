@@ -16,7 +16,7 @@ import {
     DragStartType,
 } from './sliceTypes'
 import { getTodoPosition } from './utils/getTodoPosition'
-import { getTodoChildCount } from './utils/getTodoChildCount'
+import { getTodoChildrenCount } from './utils/getTodoChildCount'
 import { getParentIndex } from './utils/getParentIndex'
 
 const initialState: TodosType = {
@@ -70,16 +70,16 @@ export const getTodosThunk = createAsyncThunk(
 export const updatePositionsThunk = createAsyncThunk<void, string, IState & RejectValueType>(
     'todos/updatePositionsThunk',
     async (payload, { getState, dispatch, rejectWithValue }) => {
-        // try {
-        //     const state = getState()
-        //     const positions = state.todos.todoPositionDTOs
-        //     if (positions.length) {
-        //         dispatch(clearTodoPositions())
-        //         await API.todos.updatePositions(payload, positions)
-        //     }
-        // } catch (error: any) {
-        //     return rejectWithValue(error.response?.status)
-        // }
+        try {
+            const state = getState()
+            const positions = state.todos.todoPositionDTOs
+            if (positions.length) {
+                dispatch(clearTodoPositions())
+                await API.todos.updatePositions(payload, positions)
+            }
+        } catch (error: any) {
+            return rejectWithValue(error.response?.status)
+        }
     }
 )
 
@@ -120,24 +120,24 @@ export const createTodoThunk = createAsyncThunk<void, CreateTodoProps, IState & 
 
 export const updateTodoThunk = createAsyncThunk(
     'todos/updateTodoThunk',
-    async (payload: UpdateTodoProps, thunkAPI) => {
+    async (payload: UpdateTodoProps, { rejectWithValue }) => {
         try {
             await API.todos.updateTodo(payload.categoryId, payload.id, payload.todoDTO)
             return payload
         } catch (error: any) {
-            return thunkAPI.rejectWithValue(error.response?.status)
+            return rejectWithValue(error.response?.status)
         }
     }
 )
 
 export const deleteTodoThunk = createAsyncThunk(
     'todos/deleteTodoThunk',
-    async (payload: DeleteTodoProps, thunkAPI) => {
+    async (payload: DeleteTodoProps, { dispatch, rejectWithValue }) => {
         try {
+            dispatch(deleteTodo(payload.id))
             await API.todos.deleteTodo(payload.categoryId, payload.id)
-            return payload.id
         } catch (error: any) {
-            return thunkAPI.rejectWithValue(error.response?.status)
+            return rejectWithValue(error.response?.status)
         }
     }
 )
@@ -161,7 +161,7 @@ export const todosSlice = createSlice({
             if (index !== -1) {
                 const isDone = !todos[index].isDone
                 if (isDone) {
-                    const childrenCount = getTodoChildCount(todos, index)
+                    const childrenCount = getTodoChildrenCount(todos, index)
                     for (let i = index + 1; i < todos.length && i <= index + childrenCount; i++) {
                         todos[i].isDone = true
                     }
@@ -205,66 +205,37 @@ export const todosSlice = createSlice({
                 ...action.payload,
             }
         },
-        moveTodo: (
-            state,
-            action: PayloadAction<{ id: string; overId: string; actualDepth: number }>
-        ) => {
-            /*
-            function moveElementInArray<T>(array: T[], fromIndex: number, toIndex: number): T[] {
-                const newArray = [...array];
-                const element = newArray[fromIndex];
-                newArray.splice(fromIndex, 1);
-                newArray.splice(toIndex, 0, element);
-                return newArray;
-}
-            */
-            // const todos = state.items
-            // const { id, overId, actualDepth } = action.payload
-            // const activeIndex = todos.findIndex(todo => todo.id.toString() === id)
-            // const overIndex = todos.findIndex(todo => todo.id.toString() === overId)
-            // const depth = getTodoDepth(todos, activeIndex, overIndex, actualDepth)
-            // const prevIndex = activeIndex >= overIndex ? overIndex - 1 : overIndex
-            // if (
-            //     todos[prevIndex]?.id === todos[activeIndex - 1]?.id &&
-            //     todos[activeIndex].depth === depth
-            // )
-            //     return
-            // state.todoPositionDTOs.push({
-            //     id: todos[activeIndex].id,
-            //     ...getTodoPosition(todos, prevIndex, depth, activeIndex),
-            // })
-            // let todoChildrenCount = 0
-            // for (let i = activeIndex + 1; i < todos.length; i++) {
-            //     if (todos[i].depth > todos[activeIndex].depth) {
-            //         todoChildrenCount++
-            //         todos[i].depth += depth - todos[activeIndex].depth
-            //     } else break
-            // }
-            // todos[activeIndex].depth = depth
-            // const spliceTodos = todos.splice(activeIndex, todoChildrenCount + 1)
-            // if (activeIndex < overIndex) {
-            //     const toIndex = overIndex - todoChildrenCount
-            //     todos.splice(toIndex < 0 ? -1 : toIndex, 0, ...spliceTodos)
-            // } else {
-            //     todos.splice(overIndex, 0, ...spliceTodos)
-            // }
+        moveTodo: (state, action: PayloadAction<{ id: string; overId: string; depth: number }>) => {
+            const todos = state.items
+            const { id, overId, depth } = action.payload
+
+            const activeIndex = todos.findIndex(todo => todo.id === id)
+            const depthDelta = depth - todos[activeIndex].depth
+            const childrenCount = getTodoChildrenCount(todos, activeIndex)
+            const movedElements = todos.splice(activeIndex, childrenCount + 1)
+
+            for (let i = 0; i < movedElements.length; i++) movedElements[i].depth += depthDelta
+
+            if (id === overId) {
+                todos.splice(activeIndex, 0, ...movedElements)
+            } else {
+                const overIndex = todos.findIndex(todo => todo.id === overId)
+                todos.splice(
+                    overIndex >= activeIndex ? overIndex + 1 : overIndex,
+                    0,
+                    ...movedElements
+                )
+            }
+
+            state.todoPositionDTOs.push({
+                id: id,
+                ...getTodoPosition(todos, id, true),
+            })
         },
-        stopDragTodo: state => {
-            state.draggedTodo.activeIndex = -1
-        },
-        openTodoEditor: (state, action: PayloadAction<OpenTodoEditorProps | undefined>) => {
-            // const { value, ...payload } = action.payload || {}
-            // state.todoEditor = {
-            //     isOpen: true,
-            //     value: value ? value : { value: '' },
-            //     ...payload,
-            // }
-        },
-        closeTodoEditor: state => {
-            // state.todoEditor = {
-            //     isOpen: false,
-            //     value: state.todoEditor.value,
-            // }
+        deleteTodo: (state, action: PayloadAction<string>) => {
+            const todoIndex = state.items.findIndex(todo => todo.id === action.payload)
+            const count = getTodoChildrenCount(state.items, todoIndex)
+            state.items.splice(todoIndex, 1 + count)
         },
     },
     extraReducers: builder => {
@@ -288,11 +259,6 @@ export const todosSlice = createSlice({
                     todo.taskEnd = action.payload.todoDTO.taskEnd
                 }
             })
-            .addCase(deleteTodoThunk.fulfilled, (state, action) => {
-                const todoIndex = state.items.findIndex(todo => todo.id === action.payload)
-                const count = getTodoChildCount(state.items, todoIndex)
-                state.items.splice(todoIndex, 1 + count)
-            })
     },
 })
 
@@ -301,11 +267,9 @@ export const {
     toggleTodoProgress,
     toggleTodoCollapsed,
     moveTodo,
-    openTodoEditor,
-    closeTodoEditor,
     startDragTodo,
     setDragShift,
-    stopDragTodo,
     clearTodoPositions,
     clearTodoStatuses,
+    deleteTodo,
 } = todosSlice.actions

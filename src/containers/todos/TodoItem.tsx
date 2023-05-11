@@ -4,11 +4,12 @@ import {
     createTodoThunk,
     deleteTodoThunk,
     toggleTodoCollapsed,
+    toggleTodoProgress,
     updateTodoThunk,
 } from '../../slices/todosSlice'
 import { useAppDispatch } from '../../slices/store'
 import moment from 'moment'
-import { serverDateFormat } from '../../dateFormat'
+import { appDateFormat, serverDateFormat } from '../../dateFormat'
 import { modalContext } from '../ModalContext'
 import { TodoEditValue } from './types'
 import { DragHandleProps } from '../sortableTree/types'
@@ -18,8 +19,6 @@ export const TodoItem: FC<{ item: Todo; categoryId: string; handleProps?: DragHa
     categoryId,
     handleProps,
 }) => {
-    const [isLoad, setIsLoad] = useState(false)
-
     const { openModal } = useContext(modalContext)
 
     const dispatch = useAppDispatch()
@@ -82,6 +81,22 @@ export const TodoItem: FC<{ item: Todo; categoryId: string; handleProps?: DragHa
                 display: 'flex',
             }}
         >
+            <div
+                {...handleProps}
+                style={{
+                    position: 'absolute',
+                    width: '20px',
+                    height: '100%',
+                    backgroundColor: 'yellowgreen',
+                    left: -20,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    cursor: 'move',
+                }}
+            >
+                :
+            </div>
             {item.showHideButton && (
                 <div
                     onClick={() => {
@@ -91,10 +106,23 @@ export const TodoItem: FC<{ item: Todo; categoryId: string; handleProps?: DragHa
                     {item.isOpen ? '🡫' : '>'}
                 </div>
             )}
-            {item.value}
-            {isLoad ? (
-                <span> Загрузкака...</span>
-            ) : (
+            <input
+                type='checkbox'
+                checked={item.isDone}
+                onChange={() => dispatch(toggleTodoProgress(item.id))}
+            />
+            <div
+                style={{
+                    padding: '5px',
+                    color: 'yellow',
+                }}
+            >
+                {item.id}
+            </div>
+            <div>
+                {item.value} <div>{item.taskEnd?.format(appDateFormat)}</div>
+            </div>
+            {
                 <>
                     <button
                         onClick={() => {
@@ -119,15 +147,13 @@ export const TodoItem: FC<{ item: Todo; categoryId: string; handleProps?: DragHa
                     </button>
                     <button
                         onClick={async () => {
-                            setIsLoad(true)
-                            await dispatch(deleteTodoThunk({ categoryId, id: item.id }))
-                            setIsLoad(false)
+                            dispatch(deleteTodoThunk({ categoryId, id: item.id }))
                         }}
                     >
                         Delete
                     </button>
                 </>
-            )}
+            }
         </div>
     )
 }

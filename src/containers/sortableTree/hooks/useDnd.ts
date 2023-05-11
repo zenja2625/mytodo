@@ -4,6 +4,8 @@ import { getLimitValue } from '../utils/getLimitValue'
 import { skipDragItems } from '../utils/skipDragItems'
 import { Coors, TreeItem } from '../types'
 import { useListeners } from './useListeners'
+import { useAppDispatch } from '../../../slices/store'
+import { moveTodo } from '../../../slices/todosSlice'
 
 export const useDnd = <T extends TreeItem>(
     height: number,
@@ -19,6 +21,8 @@ export const useDnd = <T extends TreeItem>(
     const [overIndex, setOverIndex] = useState(-1)
     const [depth, setDepth] = useState(0)
     const [initialPosition, setInitialPosition] = useState({ x: 0, y: 0 })
+
+    const dispatch = useAppDispatch()
 
     useEffect(() => {
         itemsRef.current = items
@@ -71,15 +75,16 @@ export const useDnd = <T extends TreeItem>(
         document.body.style.cursor = ''
         document.body.style.scrollBehavior = ''
 
-        // appDispath(
-        //     moveTodo({
-        //         id: items[activeIndex].id,
-        //         overId: items[overIndex].id,
-        //         actualDepth: depth,
-        //     })
-        // )
+        dispatch(
+            moveTodo({
+                id: order[activeIndex].id,
+                overId: order[overIndex].id,
+                depth: depth,
+            })
+        )
+
         setActiveIndex(-1)
-    }, [])
+    }, [order, activeIndex, overIndex, depth, dispatch])
 
     useListeners(activeIndex !== -1, onMove, dragEnd)
 

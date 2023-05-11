@@ -1,38 +1,23 @@
-import { createDraftSafeSelector } from '@reduxjs/toolkit'
+import { createSelector } from '@reduxjs/toolkit'
 import { Todo } from '../slices/sliceTypes'
 import { RootState } from '../slices/store'
+import { getTodoChildrenCount } from '../slices/utils/getTodoChildCount'
 
-export const getTodos = createDraftSafeSelector(
+export const getTodos = createSelector(
     (state: RootState) => state.todos.items,
-    (state: RootState) => state.todos.draggedTodo.activeIndex,
-    (state: RootState) => state.categories.showCompletedTodos,
-    (todos, draggedTodoIndex, showCompletedTodos) => {
-        const draggedTodoId = draggedTodoIndex !== -1 ? todos[draggedTodoIndex].id : null
-
-        let newTodos: Array<Todo> = []
-
-        let todoIndex = -1
+    todos => {
+        const newTodos: Array<Todo> = []
 
         for (let i = 0; i < todos.length; i++) {
-            if (todoIndex !== -1) {
-                if (todos[todoIndex].depth < todos[i].depth) continue
-                else todoIndex = -1
-            }
-
-            if (!showCompletedTodos && todos[i].isDone) {
-                todoIndex = i
-                continue
-            }
-
-            if (!todos[i].isOpen || todos[i].id === draggedTodoId) todoIndex = i
-
-            if (newTodos.length && newTodos[newTodos.length - 1].depth < todos[i].depth)
-                newTodos[newTodos.length - 1].showHideButton = true
+            const todo = todos[i]
+            const childrenCount = getTodoChildrenCount(todos, i)
 
             newTodos.push({
-                ...todos[i],
-                showHideButton: !todos[i].isOpen,
+                ...todo,
+                showHideButton: childrenCount > 0,
             })
+
+            if (!todos[i].isOpen) i += childrenCount
         }
 
         return newTodos
