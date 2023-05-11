@@ -35,22 +35,27 @@ export const SortableTree = <T extends TreeItem>({
         innerRef.current,
         items,
         maxDepth,
-        itemDepthWidth
+        itemDepthWidth,
+        onDrop
     )
 
     const value: InnerElementContext = useMemo(
         () =>
-            activeIndex !== -1
-                ? {
-                      isDrag: true,
-                      itemHeight,
-                      xOffset: depth * itemDepthWidth,
-                      yOffset: overIndex * (itemHeight + gap),
-                      header,
-                      footer,
-                  }
-                : innerElementInitialValue,
-        [activeIndex, overIndex, depth, itemDepthWidth, itemHeight, gap]
+            Object.assign(
+                {
+                    header,
+                    footer,
+                },
+                activeIndex !== -1
+                    ? {
+                          isDrag: true,
+                          itemHeight,
+                          xOffset: depth * itemDepthWidth,
+                          yOffset: overIndex * (itemHeight + gap),
+                      }
+                    : innerElementInitialValue
+            ),
+        [activeIndex, overIndex, depth, itemDepthWidth, itemHeight, gap, header, footer]
     )
 
     const getRowStyle = useCallback(

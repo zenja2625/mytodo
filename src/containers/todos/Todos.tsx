@@ -6,12 +6,13 @@ import {
     createTodoThunk,
     deleteTodoThunk,
     getTodosThunk,
+    moveTodo,
+    toggleShowCompletedTodos,
     updatePositionsThunk,
     updateStatusesThunk,
 } from '../../slices/todosSlice'
 import { getTodos } from '../../selectors/getTodos'
 import { CategoryParamsType } from '../types'
-import { toggleShowCompletedTodos } from '../../slices/categoriesSlice'
 import { LoadPage } from '../LoadPage'
 import { useLoadDelay } from '../../hooks/useLoadDelay'
 import { modalContext } from '../ModalContext'
@@ -30,7 +31,7 @@ export const Todos = () => {
 
     const { openModal } = useContext(modalContext)
 
-    const withCompleted = useAppSelector(state => state.categories.showCompletedTodos)
+    const withCompleted = useAppSelector(state => state.todos.withCompleted)
 
     const categories = useAppSelector(state => state.categories.items)
     const todosRequestId = useAppSelector(state => state.todos.todosRequestId)
@@ -74,6 +75,30 @@ export const Todos = () => {
         else dispatch(clearTodos())
     }, [selectedCategory, withCompleted])
 
+    const onDrop = useCallback(
+        (id: string, overId: string, depth: number) => {
+            dispatch(moveTodo({ id, overId, depth }))
+        },
+        [dispatch]
+    )
+
+    const header = useMemo(() => {
+        return (
+            <div
+                style={{
+                    backgroundColor: 'skyblue',
+                    width: '100%',
+                    height: '60px',
+                }}
+            >
+                qqq
+                <button onClick={() => dispatch(toggleShowCompletedTodos())}>
+                    {withCompleted ? 'Скрыть' : 'Показать'}
+                </button>
+            </div>
+        )
+    }, [selectedCategory, withCompleted])
+
     if (showLoadPage) return <LoadPage />
 
     if (!selectedCategory) return <div className='todos'>Take Category</div>
@@ -92,48 +117,9 @@ export const Todos = () => {
                     />
                 )}
                 renderOverlay={item => <TodoItem1 item={item} />}
-                onDrop={() => {}}
+                onDrop={onDrop}
+                header={header}
             />
-
-            {/* {selectedCategory.name}
-            <button onClick={() => dispatch(toggleShowCompletedTodos())}>
-                {withCompleted.toString()}
-            </button>
-            {todosRequestId}
-
-            {todos.map(item => (
-                <TodoItem key={item.id} item={item} categoryId={selectedCategory.id} />
-            ))}
-
-            <button
-                onClick={() => {
-                    openModal({
-                        onSubmit: async (data: TodoEditValue) => {
-                            if (categoryId) {
-                                data.taskEnd = data.taskEnd
-                                    ? moment(data.taskEnd, serverDateFormat)
-                                    : undefined
-
-                                await dispatch(
-                                    createTodoThunk({ categoryId: selectedCategory.id, ...data })
-                                )
-                            }
-                        },
-                        fields: {
-                            value: {
-                                options: {
-                                    required: true,
-                                },
-                            },
-                            taskEnd: {
-                                inputType: 'date',
-                            },
-                        },
-                    })
-                }}
-            >
-                Add Item
-            </button> */}
         </div>
     )
 }

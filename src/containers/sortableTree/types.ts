@@ -10,7 +10,7 @@ export type SortableTreeProps<T extends TreeItem> = {
     footer?: JSX.Element
     renderItem: (item: T, handleProps: DragHandleProps) => JSX.Element
     renderOverlay: (item: T) => JSX.Element
-    onDrop: (activeId: string, overId: string) => void
+    onDrop: (id: string, overId: string, depth: number) => void
 }
 
 export type DragHandleProps = {

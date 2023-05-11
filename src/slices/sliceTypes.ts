@@ -60,7 +60,6 @@ export interface IEditor<T> {
 export type CategoriesType = {
     items: Array<Category>
     editor: IEditor<string>
-    showCompletedTodos: boolean
 }
 
 export type TodoDragType = {
@@ -73,13 +72,7 @@ export type TodosType = {
     items: Array<TodoDTO>
     todoStatusDTOs: Array<TodoStatusDTO>
     todoPositionDTOs: Array<TodoPositionDTO>
-    // todoEditor: ITodoEditor
-    draggedTodo: {
-        activeIndex: number
-        overIndex: number
-        depth: number
-        initialPosition: Coors
-    }
+    withCompleted: boolean
     todosRequestId: string | null
 }
 

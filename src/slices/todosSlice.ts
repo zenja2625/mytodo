@@ -23,17 +23,8 @@ const initialState: TodosType = {
     items: [],
     todoStatusDTOs: [],
     todoPositionDTOs: [],
-    // todoEditor: {
-    //     isOpen: false,
-    //     value: { value: '' },
-    // },
-    draggedTodo: {
-        activeIndex: -1,
-        overIndex: -1,
-        depth: 0,
-        initialPosition: { x: 0, y: 0 },
-    },
     todosRequestId: null,
+    withCompleted: false,
 }
 
 type UpdateTodoProps = {
@@ -50,6 +41,12 @@ type DeleteTodoProps = {
 type GetTodosProps = {
     categoryId: string
     withCompleted: boolean
+}
+
+export type MoveTodoProps = {
+    id: string
+    overId: string
+    depth: number
 }
 
 export const depthIndent = 40
@@ -104,7 +101,7 @@ export const createTodoThunk = createAsyncThunk<void, CreateTodoProps, IState & 
     async (payload, { getState, rejectWithValue, dispatch }) => {
         try {
             const todos = getState().todos.items
-            const withCompleted = getState().categories.showCompletedTodos
+            const withCompleted = getState().todos.withCompleted
 
             await API.todos.createTodo(payload.categoryId, {
                 value: payload.value,
@@ -146,6 +143,9 @@ export const todosSlice = createSlice({
     name: 'todos',
     initialState,
     reducers: {
+        toggleShowCompletedTodos: state => {
+            state.withCompleted = !state.withCompleted
+        },
         clearTodos: state => {
             state.items = []
         },
@@ -157,26 +157,34 @@ export const todosSlice = createSlice({
         },
         toggleTodoProgress: (state, action: PayloadAction<string>) => {
             const todos = state.items
+            const withCompleted = state.withCompleted
             const index = todos.findIndex(todo => todo.id === action.payload)
+
             if (index !== -1) {
                 const isDone = !todos[index].isDone
+
+                state.todoStatusDTOs.push({
+                    id: todos[index].id,
+                    isDone,
+                })
+
                 if (isDone) {
                     const childrenCount = getTodoChildrenCount(todos, index)
-                    for (let i = index + 1; i < todos.length && i <= index + childrenCount; i++) {
-                        todos[i].isDone = true
+                    if (withCompleted) {
+                        for (let i = index; i <= index + childrenCount; i++) {
+                            todos[i].isDone = true
+                        }
+                    } else {
+                        todos.splice(index, childrenCount + 1)
                     }
                 } else {
+                    todos[index].isDone = false
                     let parentIndex = getParentIndex(todos, index)
                     while (parentIndex !== -1) {
                         todos[parentIndex].isDone = false
                         parentIndex = getParentIndex(todos, parentIndex)
                     }
                 }
-                todos[index].isDone = isDone
-                state.todoStatusDTOs.push({
-                    id: todos[index].id,
-                    isDone,
-                })
             }
         },
         toggleTodoCollapsed: (state, action: PayloadAction<string>) => {
@@ -193,19 +201,7 @@ export const todosSlice = createSlice({
                 })
             }
         },
-        startDragTodo: (state, action: PayloadAction<DragStartType>) => {
-            state.draggedTodo = {
-                ...action.payload,
-                overIndex: action.payload.activeIndex,
-            }
-        },
-        setDragShift: (state, action: PayloadAction<{ overIndex: number; depth: number }>) => {
-            state.draggedTodo = {
-                ...state.draggedTodo,
-                ...action.payload,
-            }
-        },
-        moveTodo: (state, action: PayloadAction<{ id: string; overId: string; depth: number }>) => {
+        moveTodo: (state, action: PayloadAction<MoveTodoProps>) => {
             const todos = state.items
             const { id, overId, depth } = action.payload
 
@@ -267,9 +263,8 @@ export const {
     toggleTodoProgress,
     toggleTodoCollapsed,
     moveTodo,
-    startDragTodo,
-    setDragShift,
     clearTodoPositions,
     clearTodoStatuses,
     deleteTodo,
+    toggleShowCompletedTodos,
 } = todosSlice.actions
