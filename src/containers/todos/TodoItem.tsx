@@ -13,6 +13,7 @@ import { appDateFormat, serverDateFormat } from '../../dateFormat'
 import { modalContext } from '../ModalContext'
 import { TodoEditValue } from './types'
 import { DragHandleProps } from '../sortableTree/types'
+import { todoFields } from '../../formFields'
 
 export const TodoItem: FC<{ item: Todo; categoryId: string; handleProps?: DragHandleProps }> = ({
     item,
@@ -22,6 +23,8 @@ export const TodoItem: FC<{ item: Todo; categoryId: string; handleProps?: DragHa
     const { openModal } = useContext(modalContext)
 
     const dispatch = useAppDispatch()
+
+
 
     const openEditor = (isEdit: boolean, addBefore?: boolean) => {
         openModal({
@@ -34,16 +37,13 @@ export const TodoItem: FC<{ item: Todo; categoryId: string; handleProps?: DragHa
                             updateTodoThunk({
                                 categoryId,
                                 id: item.id,
-                                todoDTO: {
-                                    value: data.value,
-                                    taskEnd: data.taskEnd,
-                                },
+                                todoDTO: data,
                             })
                         )
                     } else {
                         await dispatch(
                             createTodoThunk({
-                                categoryId: categoryId,
+                                categoryId,
                                 ...data,
                                 addBefore,
                                 overId: item.id,
@@ -58,16 +58,7 @@ export const TodoItem: FC<{ item: Todo; categoryId: string; handleProps?: DragHa
                       taskEnd: item.taskEnd,
                   }
                 : undefined,
-            fields: {
-                value: {
-                    options: {
-                        required: true,
-                    },
-                },
-                taskEnd: {
-                    inputType: 'date',
-                },
-            },
+            fields: todoFields,
         })
     }
 
@@ -146,8 +137,10 @@ export const TodoItem: FC<{ item: Todo; categoryId: string; handleProps?: DragHa
                         Edit
                     </button>
                     <button
-                        onClick={async () => {
-                            dispatch(deleteTodoThunk({ categoryId, id: item.id }))
+                        onClick={() => {
+                            const response = window.confirm('Remove this item')
+
+                            if (response) dispatch(deleteTodoThunk({ categoryId, id: item.id }))
                         }}
                     >
                         Delete

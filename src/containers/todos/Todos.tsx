@@ -25,6 +25,7 @@ import { SortableTree } from '../sortableTree/SortableTree'
 import { TodoItem1 } from './TodoItem1'
 import { useDebounce } from '../../hooks/useDebounce'
 import { TodoPositionDTO, TodoStatusDTO } from '../../api/apiTypes'
+import { todoFields } from '../../formFields'
 
 export const Todos = () => {
     const { categoryId } = useParams<CategoryParamsType>()
@@ -99,6 +100,46 @@ export const Todos = () => {
         )
     }, [selectedCategory, withCompleted])
 
+    const footer = useMemo(
+        () => (
+            <div
+                style={{
+                    width: '100%',
+                    backgroundColor: 'skyblue',
+                }}
+            >
+                <button
+                    onClick={() =>
+                        openModal({
+                            onSubmit: async (data: TodoEditValue) => {
+                                if (categoryId) {
+                                    data.taskEnd = data.taskEnd
+                                        ? moment(data.taskEnd, serverDateFormat)
+                                        : undefined
+
+                                    await dispatch(
+                                        createTodoThunk({
+                                            categoryId,
+                                            ...data,
+                                            overId:
+                                                todos.length > 0
+                                                    ? todos[todos.length - 1].id
+                                                    : undefined,
+                                        })
+                                    )
+                                }
+                            },
+                            fields: todoFields,
+                        })
+                    }
+                >
+                    New
+                </button>
+            </div>
+        ),
+        []
+    )
+
     if (showLoadPage) return <LoadPage />
 
     if (!selectedCategory) return <div className='todos'>Take Category</div>
@@ -119,6 +160,7 @@ export const Todos = () => {
                 renderOverlay={item => <TodoItem1 item={item} />}
                 onDrop={onDrop}
                 header={header}
+                footer={footer}
             />
         </div>
     )

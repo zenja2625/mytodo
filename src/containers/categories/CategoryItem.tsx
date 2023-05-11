@@ -6,8 +6,8 @@ import { FormFieldsType, FormType } from '../utils/types'
 import { DeepPartial, DefaultValues } from 'react-hook-form'
 import { useAppDispatch } from '../../slices/store'
 import { deleteCategoryThunk, updateCategoryThunk } from '../../slices/categoriesSlice'
+import { CategoryRequestDTO } from '../../api/apiTypes'
 
-type asd = { name: string }
 
 export const CategoryItem: FC<Category> = ({ id, name }) => {
     const navigate = useNavigate()
@@ -19,18 +19,18 @@ export const CategoryItem: FC<Category> = ({ id, name }) => {
         navigate(`/category/${id}`)
     }, [id, navigate])
 
-    const fields: FormFieldsType<asd> = {
+    const fields: FormFieldsType<CategoryRequestDTO> = {
         name: {
             options: {
                 required: 'True',
             },
         },
     }
-    const defaultValues: DeepPartial<asd> = {
+    const defaultValues: DeepPartial<CategoryRequestDTO> = {
         name,
     }
 
-    const modalProps: FormType<asd> = {
+    const modalProps: FormType<CategoryRequestDTO> = {
         fields,
         onSubmit: async data => {
             await dispatch(updateCategoryThunk({ id, ...data }))
