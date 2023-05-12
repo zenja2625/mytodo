@@ -12,6 +12,7 @@ import { initializeApp } from './slices/appSlice'
 import { useAppDispatch, useAppSelector } from './slices/store'
 import { Register } from './containers/account/Register'
 import { ModalContext } from './containers/ModalContext'
+import { ModalProvider } from './containers/modal/ModalProvider'
 
 export const App = () => {
     const isAuth = useAppSelector(state => state.account.isAuth)
@@ -25,7 +26,7 @@ export const App = () => {
     if (!initialized) return <LoadPage />
 
     return (
-        <>
+        <ModalProvider>
             <ModalContext>
                 <Header />
                 <div style={{ position: 'absolute', zIndex: '1000', right: 0 }}>
@@ -47,6 +48,6 @@ export const App = () => {
                     <Route path='*' element={<NotFoundPage />} />
                 </Routes>
             </ModalContext>
-        </>
+        </ModalProvider>
     )
 }

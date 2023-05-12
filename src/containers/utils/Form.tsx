@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 export const Form = <T extends FieldValues>({
     fields,
     defaultValues,
+    hideButton = false,
     onSubmit,
     onSuccessfulSubmit,
 }: FormType<T>) => {
@@ -53,7 +54,11 @@ export const Form = <T extends FieldValues>({
             onSubmit={handleSubmit(onSubmit)}
         >
             {items}
-            <input disabled={isSubmitting || !isDirty || !isValid} type='submit' />
+            <input
+                hidden={hideButton}
+                disabled={isSubmitting || !isDirty || !isValid}
+                type='submit'
+            />
         </form>
     )
 }
