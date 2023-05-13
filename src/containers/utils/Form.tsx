@@ -33,6 +33,8 @@ export const Form = <T extends FieldValues>({
               }
             : fields[item].options
 
+        const asd = errors[item]?.message
+
         return (
             <div key={item}>
                 <>
