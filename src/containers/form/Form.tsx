@@ -5,7 +5,7 @@ type FormProps<T> = {
     items: T
     onSubmit: (data: Data<T>) => Promise<void>
     defaultValues?: DeepPartial<Data<T>>
-    validates?: Validate<T>
+    validates?: Partial<Validate<T>>
 }
 
 export const Form = <T extends Items = Items>({
@@ -17,38 +17,44 @@ export const Form = <T extends Items = Items>({
     const {
         handleSubmit,
         register,
-        formState: { errors },
-    } = useForm({ defaultValues })
+        getValues,
+        formState: { errors, isSubmitting, isDirty, isValid },
+    } = useForm({ mode: 'onTouched', defaultValues })
 
-    const inputs = Object.keys(items).map(key => {
+    const inputs = Object.keys(items).map(objectKey => {
+        const key = objectKey as Path<Data<T>>
+
         const { type, minLength, required, placeholder } = items[key]
 
-        const a = key as Path<Data<T>> 
-
-        const props = register(key as Path<Data<T>>, {
+        const props = register(key, {
             required,
             minLength,
+            validate: validates?.[key] ? data => validates?.[key]?.(data, getValues()) : undefined,
         })
 
-        const asd = errors[a]?.message
+        const error = errors[key]?.message
+        const stringError = typeof error === 'string' ? error : undefined
 
-
-        console.log(asd);
-        
+        let input: JSX.Element
 
         switch (type) {
             case 'text':
-                return (
-                    <div>
-                        <input placeholder={placeholder} {...props} />
-                        {/* <div>{asd}</div> */}
-                    </div>
-                )
+                input = <input key={key} placeholder={placeholder} {...props} />
+                break
             case 'date':
-                return <input placeholder={placeholder} {...props} />
+                input = <input key={key} placeholder={placeholder} {...props} />
+                break
             case 'password':
-                return <input type='password' placeholder={placeholder} {...props} />
+                input = <input key={key} type='password' placeholder={placeholder} {...props} />
+                break
         }
+
+        return (
+            <div key={key}>
+                {input}
+                <div>{stringError}</div>
+            </div>
+        )
     })
 
     return (
@@ -57,9 +63,7 @@ export const Form = <T extends Items = Items>({
             onSubmit={handleSubmit(onSubmit)}
         >
             {inputs}
-            <input type='submit' />
+            <input disabled={isSubmitting || !isDirty || !isValid} type='submit' />
         </form>
     )
 }
-
-//Отдельны парметр компере объекст {key: key}

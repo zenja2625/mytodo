@@ -1,4 +1,4 @@
-import { ValidationRule } from 'react-hook-form'
+import { Path, PathValue, ValidationRule } from 'react-hook-form'
 
 type FieldBase = {
     required?: string
@@ -33,7 +33,7 @@ export type Data<T> = {
 }
 
 export type Validate<T> = {
-    [K in keyof T]?: (item: ItemDataType<T[K]>, items: Partial<T>) => string
+    [K in keyof T]: (item: PathValue<Data<T>, Path<Data<T>>>, items: Data<T>) => string | undefined
 }
 
 export const items: MyItems = {
