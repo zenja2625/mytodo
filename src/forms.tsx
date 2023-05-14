@@ -12,12 +12,12 @@ type RegisterFields = {
 }
 
 type CategoryFields = {
-    value: TextField
+    name: TextField
 }
 
 type TodoFields = {
     value: TextField
-    date: DateField
+    taskEnd: DateField
 }
 
 export const loginFields: LoginFields = {
@@ -55,7 +55,7 @@ export const registerFields: RegisterFields = {
 }
 
 export const categoryFields: CategoryFields = {
-    value: {
+    name: {
         type: 'text',
         required: 'This field is required',
         placeholder: 'Category Name',
@@ -68,7 +68,7 @@ export const todoFields: TodoFields = {
         required: 'This field is required',
         placeholder: 'Category Name',
     },
-    date: {
+    taskEnd: {
         type: 'date',
     },
 }

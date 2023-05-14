@@ -1,10 +1,8 @@
-import { useContext } from 'react'
+import { useCallback, useContext } from 'react'
 import { useAppDispatch, useAppSelector } from '../../slices/store'
 import { CategoryItem } from './CategoryItem'
-import { modalContext } from '../ModalContext'
-import { FormFieldsType, FormType } from '../utils/types'
-import { DeepPartial } from 'react-hook-form'
 import { createCategoryThunk, updateCategoryThunk } from '../../slices/categoriesSlice'
+import { CategoryRequestDTO } from '../../api/apiTypes'
 type asd = { name: string }
 
 export const Categories = () => {
@@ -13,24 +11,11 @@ export const Categories = () => {
 
     const dispatch = useAppDispatch()
 
-    const { openModal } = useContext(modalContext)
-
     const className = 'categories' + (siderCollapsed ? ' hidden' : '')
 
-    const fields: FormFieldsType<asd> = {
-        name: {
-            options: {
-                required: 'True',
-            },
-        },
-    }
-
-    const modalProps: FormType<asd> = {
-        fields,
-        onSubmit: async data => {
-            await dispatch(createCategoryThunk(data.name))
-        },
-    }
+    const onSubmit = useCallback(async (data: CategoryRequestDTO) => {
+        await dispatch(createCategoryThunk(data.name))
+    }, [])
 
     return (
         <div className={className}>
@@ -40,7 +25,7 @@ export const Categories = () => {
             ))}
             <button
                 onClick={() => {
-                    openModal(modalProps)
+                    // openModal(modalProps)
                 }}
             >
                 Новая Категория

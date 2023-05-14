@@ -5,10 +5,10 @@ type FormProps<T> = {
     items: T
     onSubmit: (data: Data<T>) => Promise<void>
     defaultValues?: DeepPartial<Data<T>>
-    validates?: Partial<Validate<T>>
+    validates?: Validate<T>
 }
 
-export const Form = <T extends Items = Items>({
+export const Form = <T extends Items>({
     items,
     defaultValues,
     validates,

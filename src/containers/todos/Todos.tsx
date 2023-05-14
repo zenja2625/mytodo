@@ -15,7 +15,6 @@ import { getTodos } from '../../selectors/getTodos'
 import { CategoryParamsType } from '../types'
 import { LoadPage } from '../LoadPage'
 import { useLoadDelay } from '../../hooks/useLoadDelay'
-import { modalContext } from '../ModalContext'
 import { CreateTodoProps } from '../../slices/sliceTypes'
 import moment, { Moment } from 'moment'
 import { serverDateFormat } from '../../dateFormat'
@@ -25,12 +24,9 @@ import { SortableTree } from '../sortableTree/SortableTree'
 import { TodoItem1 } from './TodoItem1'
 import { useDebounce } from '../../hooks/useDebounce'
 import { TodoPositionDTO, TodoStatusDTO } from '../../api/apiTypes'
-import { todoFields } from '../../formFields'
 
 export const Todos = () => {
     const { categoryId } = useParams<CategoryParamsType>()
-
-    const { openModal } = useContext(modalContext)
 
     const withCompleted = useAppSelector(state => state.todos.withCompleted)
 
@@ -109,29 +105,29 @@ export const Todos = () => {
                 }}
             >
                 <button
-                    onClick={() =>
-                        openModal({
-                            onSubmit: async (data: TodoEditValue) => {
-                                if (categoryId) {
-                                    data.taskEnd = data.taskEnd
-                                        ? moment(data.taskEnd, serverDateFormat)
-                                        : undefined
+                // onClick={() =>
+                //     openModal({
+                //         onSubmit: async (data: TodoEditValue) => {
+                //             if (categoryId) {
+                //                 data.taskEnd = data.taskEnd
+                //                     ? moment(data.taskEnd, serverDateFormat)
+                //                     : undefined
 
-                                    await dispatch(
-                                        createTodoThunk({
-                                            categoryId,
-                                            ...data,
-                                            overId:
-                                                todos.length > 0
-                                                    ? todos[todos.length - 1].id
-                                                    : undefined,
-                                        })
-                                    )
-                                }
-                            },
-                            fields: todoFields,
-                        })
-                    }
+                //                 await dispatch(
+                //                     createTodoThunk({
+                //                         categoryId,
+                //                         ...data,
+                //                         overId:
+                //                             todos.length > 0
+                //                                 ? todos[todos.length - 1].id
+                //                                 : undefined,
+                //                     })
+                //                 )
+                //             }
+                //         },
+                //         fields: todoFields,
+                //     })
+                // }
                 >
                     New
                 </button>

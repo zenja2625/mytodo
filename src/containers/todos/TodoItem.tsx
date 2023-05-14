@@ -1,65 +1,58 @@
-import { FC, useContext, useState } from 'react'
+import { FC } from 'react'
 import { Todo } from '../../slices/sliceTypes'
 import {
-    createTodoThunk,
     deleteTodoThunk,
     toggleTodoCollapsed,
-    toggleTodoProgress,
-    updateTodoThunk,
+    toggleTodoProgress
 } from '../../slices/todosSlice'
 import { useAppDispatch } from '../../slices/store'
-import moment from 'moment'
-import { appDateFormat, serverDateFormat } from '../../dateFormat'
-import { modalContext } from '../ModalContext'
-import { TodoEditValue } from './types'
+import { appDateFormat } from '../../dateFormat'
 import { DragHandleProps } from '../sortableTree/types'
-import { todoFields } from '../../formFields'
 
 export const TodoItem: FC<{ item: Todo; categoryId: string; handleProps?: DragHandleProps }> = ({
     item,
     categoryId,
     handleProps,
 }) => {
-    const { openModal } = useContext(modalContext)
 
     const dispatch = useAppDispatch()
 
 
 
     const openEditor = (isEdit: boolean, addBefore?: boolean) => {
-        openModal({
-            onSubmit: async (data: TodoEditValue) => {
-                if (categoryId) {
-                    data.taskEnd = data.taskEnd ? moment(data.taskEnd, serverDateFormat) : undefined
+        // openModal({
+        //     onSubmit: async (data: TodoEditValue) => {
+        //         if (categoryId) {
+        //             data.taskEnd = data.taskEnd ? moment(data.taskEnd, serverDateFormat) : undefined
 
-                    if (isEdit) {
-                        await dispatch(
-                            updateTodoThunk({
-                                categoryId,
-                                id: item.id,
-                                todoDTO: data,
-                            })
-                        )
-                    } else {
-                        await dispatch(
-                            createTodoThunk({
-                                categoryId,
-                                ...data,
-                                addBefore,
-                                overId: item.id,
-                            })
-                        )
-                    }
-                }
-            },
-            defaultValues: isEdit
-                ? {
-                      value: item.value,
-                      taskEnd: item.taskEnd,
-                  }
-                : undefined,
-            fields: todoFields,
-        })
+        //             if (isEdit) {
+        //                 await dispatch(
+        //                     updateTodoThunk({
+        //                         categoryId,
+        //                         id: item.id,
+        //                         todoDTO: data,
+        //                     })
+        //                 )
+        //             } else {
+        //                 await dispatch(
+        //                     createTodoThunk({
+        //                         categoryId,
+        //                         ...data,
+        //                         addBefore,
+        //                         overId: item.id,
+        //                     })
+        //                 )
+        //             }
+        //         }
+        //     },
+        //     defaultValues: isEdit
+        //         ? {
+        //               value: item.value,
+        //               taskEnd: item.taskEnd,
+        //           }
+        //         : undefined,
+        //     fields: todoFields,
+        // })
     }
 
     return (

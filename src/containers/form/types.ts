@@ -20,30 +20,12 @@ export type Items = {
     [key: string]: Field
 }
 
-export type MyItems = {
-    name: TextField
-    surname: TextField
-    birthday: DateField
-}
-
 export type ItemDataType<T> = T extends TextField ? string : T extends DateField ? number : never
 
 export type Data<T> = {
     [K in keyof T]: ItemDataType<T[K]>
 }
 
-export type Validate<T> = {
+export type Validate<T> = Partial<{
     [K in keyof T]: (item: PathValue<Data<T>, Path<Data<T>>>, items: Data<T>) => string | undefined
-}
-
-export const items: MyItems = {
-    name: {
-        type: 'text',
-    },
-    surname: {
-        type: 'text',
-    },
-    birthday: {
-        type: 'date',
-    },
-}
+}>

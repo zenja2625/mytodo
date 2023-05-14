@@ -15,7 +15,7 @@ export const ModalProvider = ({ children }: PropsWithChildren) => {
 
     return (
         <modalContext.Provider value={{}}>
-            {/* <div
+            <div
                 style={{
                     position: 'absolute',
                     height: '100%',
@@ -82,7 +82,7 @@ export const ModalProvider = ({ children }: PropsWithChildren) => {
                         </button>
                     </div>
                 </div>
-            </div> */}
+            </div>
             {children}
         </modalContext.Provider>
     )
