@@ -6,8 +6,11 @@ import { useAppDispatch } from '../../slices/store'
 import { deleteCategoryThunk, updateCategoryThunk } from '../../slices/categoriesSlice'
 import { CategoryRequestDTO } from '../../api/apiTypes'
 
-
-export const CategoryItem: FC<Category> = ({ id, name }) => {
+export const CategoryItem: FC<
+    Category & {
+        openEdit: (id: string, defaultValues: DeepPartial<CategoryRequestDTO>) => void
+    }
+> = ({ id, name, openEdit }) => {
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
 
@@ -41,6 +44,7 @@ export const CategoryItem: FC<Category> = ({ id, name }) => {
             {name}
             <button
                 onClick={() => {
+                    openEdit(id, { name })
                     // openModal(modalProps)
                 }}
             >

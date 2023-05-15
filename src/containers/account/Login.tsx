@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useAppDispatch } from '../../slices/store'
 import { UserLoginDTO } from '../../api/apiTypes'
 import { Form } from '../form/Form'
@@ -19,7 +19,13 @@ export const Login = () => {
 
     return (
         <>
-            <div onClick={() => setCount(prev => prev + 1)}>{count}</div>
+            <div
+                onClick={() => {
+                    setCount(prev => prev + 1)
+                }}
+            >
+                {count}
+            </div>
             <Form items={loginFields} onSubmit={onSubmit} />
         </>
     )

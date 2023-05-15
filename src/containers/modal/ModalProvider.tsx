@@ -1,88 +1,153 @@
-import { PropsWithChildren, createContext } from 'react'
-import { useForm } from 'react-hook-form'
+import {
+    PropsWithChildren,
+    createContext,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react'
 
-export type ModalContextInitialValueProps = {}
+export type ModalContextInitialValueProps = {
+    openModal: (
+        content: JSX.Element,
+        title: string,
+        submit: () => void,
+        subscribeFromStatus: (
+            updateFormStatus: (
+                isButtonDisabled: boolean,
+                isSubmitting: boolean,
+                isSubmitSuccessful: boolean
+            ) => void
+        ) => void,
+        buttonValue?: string
+    ) => void
+}
 
-export const ModalContextInitialValue = {}
+export const ModalContextInitialValue: ModalContextInitialValueProps = {
+    openModal: () => {},
+}
 
 export const modalContext = createContext(ModalContextInitialValue)
 
 export const ModalProvider = ({ children }: PropsWithChildren) => {
-    
+    const submitRef = useRef<() => void>()
+    const subscribeRef =
+        useRef<
+            (
+                updateFormStatus: (
+                    isButtonDisabled: boolean,
+                    isSubmitting: boolean,
+                    isSubmitSuccessful: boolean
+                ) => void
+            ) => void
+        >()
 
+    const [isButtonDisabled, setIsButtonDisabled] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isSubmitSuccessful, setIsSubmitSuccessful] = useState(false)
+    const [content, setContent] = useState<JSX.Element | null>(null)
+    const [title, setTitle] = useState('None')
+    const [buttonValue, setButtonValue] = useState('Ok')
 
-    const { register, handleSubmit } = useForm({ })
+    useEffect(() => {
+        if (isSubmitSuccessful) {
+            setContent(null)
+        }
+    }, [isSubmitSuccessful])
+
+    const close = useCallback(() => {
+        setContent(null)
+    }, [])
+
+    const updateFormStatus = useCallback(
+        (isButtonDisabled: boolean, isSubmitting: boolean, isSubmitSuccessful: boolean) => {
+            setIsButtonDisabled(isButtonDisabled)
+            setIsSubmitting(isSubmitting)
+            setIsSubmitSuccessful(isSubmitSuccessful)
+        },
+        []
+    )
+
+    useEffect(() => {
+        if (content !== null) {
+            subscribeRef.current?.(updateFormStatus)
+        }
+    }, [content, updateFormStatus])
+
+    const value: ModalContextInitialValueProps = useMemo(
+        () => ({
+            openModal(content, title, submit, subscribeFromStatus, buttonValue = 'Ok') {
+                submitRef.current = submit
+                subscribeRef.current = subscribeFromStatus
+
+                setContent(content)
+                setTitle(title)
+                setButtonValue(buttonValue)
+            },
+        }),
+        []
+    )
 
     return (
-        <modalContext.Provider value={{}}>
-            <div
-                style={{
-                    position: 'absolute',
-                    height: '100%',
-                    width: '100%',
-                    zIndex: 10000,
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                }}
-            >
+        <modalContext.Provider value={value}>
+            {content && (
                 <div
                     style={{
                         position: 'absolute',
-                        backgroundColor: 'gray',
                         height: '100%',
                         width: '100%',
-                        opacity: 0.6,
-                    }}
-                ></div>
-                <div
-                    style={{
-                        width: '300px',
-                        backgroundColor: 'orangered',
                         zIndex: 10000,
                         display: 'flex',
-                        flexDirection: 'column',
-                        padding: '20px',
-                        gap: '20px',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                     }}
                 >
-                    <div>Title</div>
-
-                    <form
+                    <div
+                        onClick={() => close()}
                         style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '10px',
+                            position: 'absolute',
+                            backgroundColor: 'gray',
+                            height: '100%',
+                            width: '100%',
+                            opacity: 0.6,
                         }}
-                        onSubmit={handleSubmit(data => {
-                            alert(JSON.stringify(data))
-                        })}
-                    >
-                        <input type='text' placeholder='name' {...register('name')} />
-                        <input type='text' {...register('surname')} />
-                        <input type='text' {...register('love')} />
-                        <input hidden={true} type='submit' />
-                    </form>
-
+                    ></div>
                     <div
                         style={{
+                            width: '300px',
+                            backgroundColor: 'orangered',
+                            zIndex: 10000,
                             display: 'flex',
-                            justifyContent: 'right',
+                            flexDirection: 'column',
+                            padding: '20px',
+                            gap: '20px',
                         }}
                     >
-                        <button>Cancel</button>
-                        <button
-                            onClick={() =>
-                                handleSubmit(data => {
-                                    alert(JSON.stringify(data))
-                                })()
-                            }
+                        <div>{title}</div>
+
+                        {content}
+
+                        <div
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'right',
+                            }}
                         >
-                            Ok
-                        </button>
+                            <button onClick={() => close()}>Cancel</button>
+                            <button
+                                disabled={isButtonDisabled}
+                                onClick={() => {
+                                    submitRef.current?.()
+                                    // close()
+                                }}
+                            >
+                                {buttonValue}
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
             {children}
         </modalContext.Provider>
     )

@@ -1,28 +1,63 @@
 import { DeepPartial, Path, useForm } from 'react-hook-form'
 import { Data, Items, Validate } from './types'
+import { Ref, forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
+
+export type FormRef = {
+    submit: () => void
+    subscribeFormCheck: (
+        updateFormStatus: (
+            isButtonDisabled: boolean,
+            isSubmitting: boolean,
+            isSubmitSuccessful: boolean
+        ) => void
+    ) => void
+}
+
+type FormComponent = <T extends Items>(props: FormProps<T>, ref?: Ref<FormRef>) => JSX.Element
 
 type FormProps<T> = {
     items: T
     onSubmit: (data: Data<T>) => Promise<void>
     defaultValues?: DeepPartial<Data<T>>
     validates?: Validate<T>
+    hideButton?: boolean
 }
 
-export const Form = <T extends Items>({
-    items,
-    defaultValues,
-    validates,
-    onSubmit,
-}: FormProps<T>) => {
+const FormInner: FormComponent = (
+    { items, defaultValues, validates, hideButton, onSubmit },
+    ref
+) => {
+    const refFormCheck = useRef<
+        (isButtonDisabled: boolean, isSubmitting: boolean, isSubmitSuccessful: boolean) => void
+    >(() => {})
+
     const {
         handleSubmit,
         register,
         getValues,
-        formState: { errors, isSubmitting, isDirty, isValid },
+        formState: { errors, isSubmitting, isDirty, isValid, isSubmitSuccessful },
     } = useForm({ mode: 'onTouched', defaultValues })
 
+    useEffect(() => {
+        refFormCheck.current(isSubmitting || !isDirty || !isValid, isSubmitting, isSubmitSuccessful)
+    }, [isSubmitting, isDirty, isValid, isSubmitSuccessful])
+
+    useImperativeHandle(ref, () => ({
+        submit: () => {
+            handleSubmit(onSubmit)()
+        },
+        subscribeFormCheck: updateFormStatus => {
+            refFormCheck.current = updateFormStatus
+            refFormCheck.current(
+                isSubmitting || !isDirty || !isValid,
+                isSubmitting,
+                isSubmitSuccessful
+            )
+        },
+    }))
+
     const inputs = Object.keys(items).map(objectKey => {
-        const key = objectKey as Path<Data<T>>
+        const key = objectKey as Path<Data<typeof items>>
 
         const { type, minLength, required, placeholder } = items[key]
 
@@ -63,7 +98,15 @@ export const Form = <T extends Items>({
             onSubmit={handleSubmit(onSubmit)}
         >
             {inputs}
-            <input disabled={isSubmitting || !isDirty || !isValid} type='submit' />
+            <input
+                hidden={hideButton}
+                disabled={isSubmitting || !isDirty || !isValid}
+                type='submit'
+            />
         </form>
     )
 }
+
+export const Form = forwardRef(FormInner) as <T extends Items>(
+    props: FormProps<T> & { ref?: Ref<FormRef> }
+) => JSX.Element

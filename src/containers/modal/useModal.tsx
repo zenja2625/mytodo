@@ -1,29 +1,44 @@
-import { useContext } from 'react'
+import { useContext, useRef } from 'react'
+import { modalContext } from './ModalProvider'
+import { Form, FormRef } from '../form/Form'
+import { Data, Items } from '../form/types'
+import { DeepPartial } from 'react-hook-form'
 
-// const arr: Field[] = [{ name: 'FirstName' }, { name: 'LastName' }]
+export const useModal = <T extends Items>(items: T) => {
+    const ref = useRef<FormRef>(null)
 
-export const useModal = () => {
-    // const { setContent } = useContext(modalContext)
+    const { openModal } = useContext(modalContext)
 
-    // const createForm = () => {
+    return (
+        onSubmit: (data: Data<T>) => Promise<void>,
+        title: string,
+        buttonValue?: string,
+        defaultValues?: DeepPartial<Data<T>>
+    ) => {
+        const inputs = (
+            <Form
+                ref={ref}
+                items={items}
+                onSubmit={onSubmit}
+                hideButton={true}
+                defaultValues={defaultValues}
+            />
+        )
 
+        const subscribe = (
+            updateFormStatus: (
+                isButtonDisabled: boolean,
+                isSubmitting: boolean,
+                isSubmitSuccessful: boolean
+            ) => void
+        ) => {
+            ref.current?.subscribeFormCheck(updateFormStatus)
+        }
 
+        const submit = () => {
+            ref.current?.submit()
+        }
 
-
-    //     setContent(<Form fields={{
-    //         name: {
-    //             inputType: 'text'
-    //         },
-    //         surname: {
-    //             inputType: 'text'
-    //         }
-
-    //     }} onSubmit={data => {
-    //         alert(data.name)
-    //     }}></Form>)
-    // }
-
-    return () => {
-        // createForm()
+        openModal(inputs, title, submit, subscribe, buttonValue)
     }
 }
