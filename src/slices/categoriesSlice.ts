@@ -4,10 +4,6 @@ import { CategoriesType, Category, openCategoryEditorProps } from './sliceTypes'
 
 const initialState: CategoriesType = {
     items: [],
-    editor: {
-        isOpen: false,
-        value: '',
-    },
 }
 
 export const getCategoriesThunk = createAsyncThunk(
@@ -36,12 +32,12 @@ export const createCategoryThunk = createAsyncThunk(
 
 export const deleteCategoryThunk = createAsyncThunk(
     'categories/deleteCategoryThunk',
-    async (payload: string, thunkAPI) => {
+    async (payload: string, { dispatch, rejectWithValue }) => {
         try {
+            dispatch(deleteCategory(payload))
             await API.categories.deleteCategory(payload)
-            return payload
         } catch (error: any) {
-            return thunkAPI.rejectWithValue(error.response?.status)
+            return rejectWithValue(error.response?.status)
         }
     }
 )
@@ -62,36 +58,19 @@ export const categoriesSlice = createSlice({
     name: 'categories',
     initialState,
     reducers: {
-       
-        openCategoryEditor: (state, action: PayloadAction<openCategoryEditorProps | undefined>) => {
-            const value = action.payload?.value || ''
-
-            state.editor = {
-                isOpen: true,
-                value: value,
-                editId: action.payload?.editId
-            }
-        },
-        closeCategoryEditor: state => {
-            state.editor = {
-                isOpen: false,
-                value: state.editor.value,
-            }
+        deleteCategory: (state, action: PayloadAction<string>) => {
+            const index = state.items.findIndex(category => category.id === action.payload)
+            state.items.splice(index, 1)
         },
     },
     extraReducers: builder => {
         builder.addCase(getCategoriesThunk.fulfilled, (state, action) => {
             state.items = action.payload
         })
-        builder.addCase(deleteCategoryThunk.fulfilled, (state, action) => {
-            state.items = state.items.filter(c => c.id !== action.payload)
-        })
         builder.addCase(updateCategoryThunk.fulfilled, (state, action) => {
-            state.items = state.items.map(x =>
-                x.id === action.payload.id ? action.payload : x
-            )
+            state.items = state.items.map(x => (x.id === action.payload.id ? action.payload : x))
         })
     },
 })
 
-export const { openCategoryEditor, closeCategoryEditor } = categoriesSlice.actions
+export const { deleteCategory } = categoriesSlice.actions

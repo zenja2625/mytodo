@@ -59,7 +59,6 @@ export interface IEditor<T> {
 
 export type CategoriesType = {
     items: Array<Category>
-    editor: IEditor<string>
 }
 
 export type TodoDragType = {

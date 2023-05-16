@@ -2,6 +2,7 @@ import { DeepPartial, Path, useForm } from 'react-hook-form'
 import { Data, Items, Validate } from './types'
 import { Ref, forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 
+
 export type FormRef = {
     submit: () => void
     subscribeFormCheck: (
@@ -77,7 +78,7 @@ const FormInner: FormComponent = (
                 input = <input key={key} placeholder={placeholder} {...props} />
                 break
             case 'date':
-                input = <input key={key} placeholder={placeholder} {...props} />
+                input = <input key={key} type='date' placeholder={placeholder} {...props} />
                 break
             case 'password':
                 input = <input key={key} type='password' placeholder={placeholder} {...props} />
