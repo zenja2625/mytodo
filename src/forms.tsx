@@ -1,4 +1,4 @@
-import { DateField, TextField } from './containers/form/types'
+import { DateField, OptionalDateField, TextField } from './containers/form/types'
 
 type LoginFields = {
     name: TextField
@@ -17,7 +17,7 @@ type CategoryFields = {
 
 type TodoFields = {
     value: TextField
-    taskEnd: DateField
+    taskEnd: OptionalDateField
 }
 
 export const loginFields: LoginFields = {

@@ -68,7 +68,8 @@ export const categoriesSlice = createSlice({
             state.items = action.payload
         })
         builder.addCase(updateCategoryThunk.fulfilled, (state, action) => {
-            state.items = state.items.map(x => (x.id === action.payload.id ? action.payload : x))
+            const index = state.items.findIndex(category => category.id === action.payload.id)
+            state.items[index].name = action.payload.name
         })
     },
 })

@@ -1,7 +1,7 @@
 import { useContext, useRef } from 'react'
 import { modalContext } from './ModalProvider'
 import { Form, FormRef } from '../form/Form'
-import { Data, Items } from '../form/types'
+import { FormData, Items, PartialFormData } from '../form/types'
 import { DeepPartial } from 'react-hook-form'
 
 export const useModal = <T extends Items>(items: T) => {
@@ -10,10 +10,10 @@ export const useModal = <T extends Items>(items: T) => {
     const { openModal } = useContext(modalContext)
 
     return (
-        onSubmit: (data: Data<T>) => Promise<void>,
+        onSubmit: (data: PartialFormData<T>) => Promise<void>,
         title: string,
         buttonValue?: string,
-        defaultValues?: DeepPartial<Data<T>>
+        defaultValues?: DeepPartial<FormData<T>>
     ) => {
         const inputs = (
             <Form

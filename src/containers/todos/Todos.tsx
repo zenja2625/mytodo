@@ -10,6 +10,7 @@ import {
     toggleShowCompletedTodos,
     updatePositionsThunk,
     updateStatusesThunk,
+    updateTodoThunk,
 } from '../../slices/todosSlice'
 import { getTodos } from '../../selectors/getTodos'
 import { CategoryParamsType } from '../types'
@@ -24,6 +25,8 @@ import { SortableTree } from '../sortableTree/SortableTree'
 import { TodoItem1 } from './TodoItem1'
 import { useDebounce } from '../../hooks/useDebounce'
 import { TodoPositionDTO, TodoStatusDTO } from '../../api/apiTypes'
+import { useModal } from '../modal/useModal'
+import { todoFields } from '../../forms'
 
 export const Todos = () => {
     const { categoryId } = useParams<CategoryParamsType>()
@@ -39,12 +42,62 @@ export const Todos = () => {
     const todos = useAppSelector(getTodos)
     const dispatch = useAppDispatch()
 
-    const showLoadPage = useLoadDelay(!!todosRequestId, 500)
+    const openModal = useModal(todoFields)
 
     const selectedCategory = useMemo(
         () => categories.find(category => category.id === categoryId),
         [categoryId, categories]
     )
+
+    const openCreateModal = useCallback(
+        (overId: string, addBefore: boolean) => {
+            if (selectedCategory) {
+                openModal(
+                    async data => {
+                        dispatch(
+                            createTodoThunk({
+                                categoryId: selectedCategory.id,
+                                value: data.value,
+                                overId,
+                                addBefore,
+                            })
+                        )
+                    },
+                    'Create Todo',
+                    'Create'
+                )
+            }
+        },
+        [selectedCategory, dispatch, openModal]
+    )
+
+    const openUpdateModal = useCallback(
+        (id: string) => {
+            if (selectedCategory) {
+                openModal(
+                    async data => {
+
+                        const { taskEnd } = data
+
+                        dispatch(
+                            updateTodoThunk({
+                                categoryId: selectedCategory.id,
+                                id,
+                                todoDTO: {
+                                    value: data.value,
+                                },
+                            })
+                        )
+                    },
+                    'Update Todo',
+                    'Update'
+                )
+            }
+        },
+        [selectedCategory, dispatch, openModal]
+    )
+
+    const showLoadPage = useLoadDelay(!!todosRequestId, 500)
 
     const fetchPositions = useCallback(
         (positions: Array<TodoPositionDTO>) => {

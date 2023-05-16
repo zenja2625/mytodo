@@ -1,5 +1,5 @@
 import { DeepPartial, Path, useForm } from 'react-hook-form'
-import { Data, Items, Validate } from './types'
+import { FormData, Items, PartialFormData, Validate } from './types'
 import { Ref, forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 
 
@@ -18,8 +18,8 @@ type FormComponent = <T extends Items>(props: FormProps<T>, ref?: Ref<FormRef>) 
 
 type FormProps<T> = {
     items: T
-    onSubmit: (data: Data<T>) => Promise<void>
-    defaultValues?: DeepPartial<Data<T>>
+    onSubmit: (data: PartialFormData<T>) => Promise<void>
+    defaultValues?: DeepPartial<FormData<T>>
     validates?: Validate<T>
     hideButton?: boolean
 }
@@ -58,7 +58,7 @@ const FormInner: FormComponent = (
     }))
 
     const inputs = Object.keys(items).map(objectKey => {
-        const key = objectKey as Path<Data<typeof items>>
+        const key = objectKey as Path<FormData<typeof items>>
 
         const { type, minLength, required, placeholder } = items[key]
 

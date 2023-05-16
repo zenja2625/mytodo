@@ -1,31 +1,52 @@
 import { Path, PathValue, ValidationRule } from 'react-hook-form'
+import { todoFields } from '../../forms'
 
 type FieldBase = {
-    required?: string
     minLength?: ValidationRule<number>
     placeholder?: string
 }
 
-export type TextField = {
+type RequiredField = {
+    required: string | true
+}
+type OptionalField = {
+    required?: false
+}
+
+type TextFieldBase = {
     type: 'text' | 'password'
 } & FieldBase
 
-export type DateField = {
+type DateFieldBase = {
     type: 'date'
 } & FieldBase
 
-export type Field = TextField | DateField
+type KeysMatching<T> = { [K in keyof T]: T[K] extends OptionalField ? K : never }[keyof T]
+
+export type TextField = TextFieldBase & RequiredField
+export type DateField = DateFieldBase & RequiredField
+export type OptionalTextField = TextFieldBase & OptionalField
+export type OptionalDateField = DateFieldBase & OptionalField
+
+export type Field = TextField | DateField | OptionalTextField | OptionalDateField
 
 export type Items = {
     [key: string]: Field
 }
 
-export type ItemDataType<T> = T extends TextField ? string : T extends DateField ? number : never
+export type ItemDataType<T> = T extends TextFieldBase
+    ? string
+    : T extends DateFieldBase
+    ? number
+    : never
 
-export type Data<T> = {
+export type FormData<T> = {
     [K in keyof T]: ItemDataType<T[K]>
 }
 
+export type PartialFormData<T> = Omit<FormData<T>, KeysMatching<T>> &
+    Partial<Pick<FormData<T>, KeysMatching<T>>>
+
 export type Validate<T> = Partial<{
-    [K in keyof T]: (item: PathValue<Data<T>, Path<Data<T>>>, items: Data<T>) => string | undefined
+    [K in keyof T]: (item: PathValue<FormData<T>, Path<FormData<T>>>, items: FormData<T>) => string | undefined
 }>
