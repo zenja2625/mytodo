@@ -16,7 +16,7 @@ import { getTodos } from '../../selectors/getTodos'
 import { CategoryParamsType } from '../types'
 import { LoadPage } from '../LoadPage'
 import { useLoadDelay } from '../../hooks/useLoadDelay'
-import { CreateTodoProps } from '../../slices/sliceTypes'
+import { CreateTodoProps, PutTodoDTO, TodoDTO } from '../../slices/sliceTypes'
 import moment, { Moment } from 'moment'
 import { serverDateFormat } from '../../dateFormat'
 import { TodoItem } from './TodoItem'
@@ -50,7 +50,7 @@ export const Todos = () => {
     )
 
     const openCreateModal = useCallback(
-        (overId: string, addBefore: boolean) => {
+        (overId: string, addBefore?: boolean) => {
             if (selectedCategory) {
                 openModal(
                     async data => {
@@ -58,6 +58,7 @@ export const Todos = () => {
                             createTodoThunk({
                                 categoryId: selectedCategory.id,
                                 value: data.value,
+                                taskEnd: data.taskEnd,
                                 overId,
                                 addBefore,
                             })
@@ -72,25 +73,26 @@ export const Todos = () => {
     )
 
     const openUpdateModal = useCallback(
-        (id: string) => {
+        (id: string, defaultValues?: PutTodoDTO) => {
             if (selectedCategory) {
                 openModal(
                     async data => {
-
-                        const { taskEnd } = data
+                        const { taskEnd, value } = data
 
                         dispatch(
                             updateTodoThunk({
                                 categoryId: selectedCategory.id,
                                 id,
                                 todoDTO: {
-                                    value: data.value,
+                                    value,
+                                    taskEnd,
                                 },
                             })
                         )
                     },
                     'Update Todo',
-                    'Update'
+                    'Update',
+                    defaultValues
                 )
             }
         },
@@ -204,6 +206,7 @@ export const Todos = () => {
                         item={item}
                         handleProps={handleProps}
                         categoryId={selectedCategory.id}
+                        openEditModal={openUpdateModal}
                     />
                 )}
                 renderOverlay={item => <TodoItem1 item={item} />}

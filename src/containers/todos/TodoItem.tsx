@@ -1,59 +1,19 @@
 import { FC } from 'react'
-import { Todo } from '../../slices/sliceTypes'
-import {
-    deleteTodoThunk,
-    toggleTodoCollapsed,
-    toggleTodoProgress
-} from '../../slices/todosSlice'
+import { PutTodoDTO, Todo } from '../../slices/sliceTypes'
+import { deleteTodoThunk, toggleTodoCollapsed, toggleTodoProgress } from '../../slices/todosSlice'
 import { useAppDispatch } from '../../slices/store'
 import { appDateFormat } from '../../dateFormat'
 import { DragHandleProps } from '../sortableTree/types'
 
-export const TodoItem: FC<{ item: Todo; categoryId: string; handleProps?: DragHandleProps }> = ({
-    item,
-    categoryId,
-    handleProps,
-}) => {
-
+export const TodoItem: FC<{
+    item: Todo
+    categoryId: string
+    handleProps?: DragHandleProps
+    openEditModal: (id: string, defaultValues?: PutTodoDTO) => void
+}> = ({ item, categoryId, handleProps, openEditModal }) => {
     const dispatch = useAppDispatch()
 
-
-
-    const openEditor = (isEdit: boolean, addBefore?: boolean) => {
-        // openModal({
-        //     onSubmit: async (data: TodoEditValue) => {
-        //         if (categoryId) {
-        //             data.taskEnd = data.taskEnd ? moment(data.taskEnd, serverDateFormat) : undefined
-
-        //             if (isEdit) {
-        //                 await dispatch(
-        //                     updateTodoThunk({
-        //                         categoryId,
-        //                         id: item.id,
-        //                         todoDTO: data,
-        //                     })
-        //                 )
-        //             } else {
-        //                 await dispatch(
-        //                     createTodoThunk({
-        //                         categoryId,
-        //                         ...data,
-        //                         addBefore,
-        //                         overId: item.id,
-        //                     })
-        //                 )
-        //             }
-        //         }
-        //     },
-        //     defaultValues: isEdit
-        //         ? {
-        //               value: item.value,
-        //               taskEnd: item.taskEnd,
-        //           }
-        //         : undefined,
-        //     fields: todoFields,
-        // })
-    }
+    const { id, value, taskEnd } = item
 
     return (
         <div
@@ -110,21 +70,22 @@ export const TodoItem: FC<{ item: Todo; categoryId: string; handleProps?: DragHa
                 <>
                     <button
                         onClick={() => {
-                            openEditor(false, true)
+                            // openEditor(false, true)
                         }}
                     >
                         Add Up
                     </button>
                     <button
                         onClick={() => {
-                            openEditor(false)
+                            // openEditor(false)
                         }}
                     >
                         Add Bottom
                     </button>
                     <button
                         onClick={() => {
-                            openEditor(true)
+                            // openEditor(true)
+                            openEditModal(id, { value, taskEnd })
                         }}
                     >
                         Edit
