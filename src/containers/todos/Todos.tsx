@@ -79,16 +79,18 @@ export const Todos = () => {
                     async data => {
                         const { taskEnd, value } = data
 
-                        dispatch(
-                            updateTodoThunk({
-                                categoryId: selectedCategory.id,
-                                id,
-                                todoDTO: {
-                                    value,
-                                    taskEnd,
-                                },
-                            })
-                        )
+                        alert(JSON.stringify(data))
+
+                        // dispatch(
+                        //     updateTodoThunk({
+                        //         categoryId: selectedCategory.id,
+                        //         id,
+                        //         todoDTO: {
+                        //             value,
+                        //             taskEnd,
+                        //         },
+                        //     })
+                        // )
                     },
                     'Update Todo',
                     'Update',

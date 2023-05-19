@@ -27,41 +27,15 @@ export type FormRef = {
 type FormComponent = <T extends Items>(props: FormProps<T>, ref?: Ref<FormRef>) => JSX.Element
 
 type FormProps<T> = {
-    items: T
+    fields: T
     onSubmit: (data: PartialFormData<T>) => Promise<void>
     defaultValues?: DeepPartial<FormData<T>>
     validates?: Validate<T>
     hideButton?: boolean
 }
 
-export const DateItemComp = <T extends Items, K extends Extract<keyof T, string>>( //K extends keys only DateField
-    name: K,
-    data: T[K],
-    control: Control<FormData<T>, any>
-    // data: any//DateFieldBase
-) => {
-
-    if (data.type === 'date') {
-    const qweqw = name
-
-        const asd = (
-            <Controller
-                name={name}
-                // control={control}
-                render={({ field }) => {
-                    const asdasd = field.value
-
-                    return <div></div>
-                }}
-            />
-        )
-    }
-
-    return <div>Form</div>
-}
-
 const FormInner: FormComponent = (
-    { items, defaultValues, validates, hideButton, onSubmit },
+    { fields, defaultValues, validates, hideButton, onSubmit },
     ref
 ) => {
     const refFormCheck = useRef<
@@ -95,67 +69,32 @@ const FormInner: FormComponent = (
         },
     }))
 
-    const inputs = Object.keys(items).map(objectKey => {
-        const key = objectKey as Path<FormData<typeof items>>
+    const inputs = Object.keys(fields).map(objectKey => {
+        const key = objectKey as Path<FormData<typeof fields>>
 
-        const { type, minLength, required, placeholder } = items[key]
-        const obj = items[key]
-
-        const props = register(key, {
-            required,
-            minLength,
-
-            validate: validates?.[key] ? data => validates?.[key]?.(data, getValues()) : undefined,
-        })
+        const field = fields[key]
 
         const error = errors[key]?.message
         const stringError = typeof error === 'string' ? error : undefined
 
         let input: JSX.Element
 
-        switch (obj.type) {
-            case 'date':
-                // const asd1: ItemDataType<typeof obj> = moment()
-                DateItemComp(key, obj, control)
+        switch (field.type) {
+            case 'text':
                 input = (
-                    <Controller
-                        name={key}
-                        control={control}
-                        // rules={{
-                        //     required: required,
-                        // }}
-                        render={({ field, fieldState, formState }) => {
-                            console.log(field.value)
-                            // console.log(fieldState)
-                            // console.log(formState)
-                            return (
-                                <input
-                                    type='date'
-                                    placeholder='asd'
-                                    onChange={event => {
-                                        field.onChange(event)
-                                        // setValue(
-                                        //     key,
-                                        //     moment(event.currentTarget.value, serverDateFormat)
-                                        // )
-                                    }}
-                                    // onBlur={field.onBlur}
-                                    // value={field.value.format(serverDateFormat)}
-                                />
-                            )
-                        }}
+                    <input
+                        key={key}
+                        placeholder={field.placeholder}
+                        {...register(key, {
+                            required: field.required,
+                            minLength: field.minLength,
+
+                            validate: validates?.[key]
+                                ? data => validates?.[key]?.(data, getValues())
+                                : undefined,
+                        })}
                     />
                 )
-
-                break
-
-            default:
-                break
-        }
-
-        switch (type) {
-            case 'text':
-                input = <input key={key} placeholder={placeholder} {...props} />
                 break
             case 'date':
                 // input = <DateItemComp type={type} {...prop}/>
@@ -164,35 +103,50 @@ const FormInner: FormComponent = (
                         name={key}
                         control={control}
                         rules={{
-                            required: required,
+                            required: field.required,
+                            validate: validates?.[key]
+                                ? data => validates?.[key]?.(data, getValues())
+                                : undefined,
                         }}
-                        render={({ field, fieldState, formState }) => {
-                            console.log(field.value)
-                            // console.log(fieldState)
-                            // console.log(formState)
+                        render={({ field }) => {
+                            const value = moment.isMoment(field.value)
+                                ? field.value.format(serverDateFormat)
+                                : ''
+
                             return (
                                 <input
                                     type='date'
                                     placeholder='asd'
-                                    onChange={event => {
-                                        field.onChange(event)
-                                        // setValue(
-                                        //     key,
-                                        //     moment(event.currentTarget.value, serverDateFormat)
-                                        // )
-                                    }}
-                                    // onBlur={field.onBlur}
-                                    // value={field.value.format(serverDateFormat)}
+                                    onChange={event =>
+                                        field.onChange(
+                                            moment(event.currentTarget.value, serverDateFormat)
+                                        )
+                                    }
+                                    onBlur={field.onBlur}
+                                    value={value}
                                 />
                             )
                         }}
                     />
                 )
 
-                // input = <input key={key} type='date' placeholder={placeholder} {...props} />
                 break
             case 'password':
-                input = <input key={key} type='password' placeholder={placeholder} {...props} />
+                input = (
+                    <input
+                        key={key}
+                        type='password'
+                        placeholder={field.placeholder}
+                        {...register(key, {
+                            required: field.required,
+                            minLength: field.minLength,
+
+                            validate: validates?.[key]
+                                ? data => validates?.[key]?.(data, getValues())
+                                : undefined,
+                        })}
+                    />
+                )
                 break
         }
 

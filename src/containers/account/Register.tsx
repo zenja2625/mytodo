@@ -22,5 +22,5 @@ export const Register = () => {
         },
     }
 
-    return <Form items={registerFields} onSubmit={onSubmit} validates={validates} />
+    return <Form fields={registerFields} onSubmit={onSubmit} validates={validates} />
 }

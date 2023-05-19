@@ -26,7 +26,7 @@ export const Login = () => {
             >
                 {count}
             </div>
-            <Form items={loginFields} onSubmit={onSubmit} />
+            <Form fields={loginFields} onSubmit={onSubmit} />
         </>
     )
 }

@@ -18,7 +18,7 @@ export const useModal = <T extends Items>(items: T) => {
         const inputs = (
             <Form
                 ref={ref}
-                items={items}
+                fields={items}
                 onSubmit={onSubmit}
                 hideButton={true}
                 defaultValues={defaultValues}
