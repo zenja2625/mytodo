@@ -14,7 +14,7 @@ import moment from 'moment'
 import { serverDateFormat } from '../../dateFormat'
 
 export type FormRef = {
-    submit: () => void
+    submit: () => Promise<void>
     subscribeFormCheck: (
         updateFormStatus: (
             isButtonDisabled: boolean,
@@ -56,8 +56,8 @@ const FormInner: FormComponent = (
     }, [isSubmitting, isDirty, isValid, isSubmitSuccessful])
 
     useImperativeHandle(ref, () => ({
-        submit: () => {
-            handleSubmit(onSubmit)()
+        submit: async () => {
+            await handleSubmit(onSubmit)()
         },
         subscribeFormCheck: updateFormStatus => {
             refFormCheck.current = updateFormStatus
@@ -90,7 +90,7 @@ const FormInner: FormComponent = (
                             minLength: field.minLength,
 
                             validate: validates?.[key]
-                                ? data => validates?.[key]?.(data, getValues())
+                                ? (data, fields) => validates?.[key]?.(data, fields)
                                 : undefined,
                         })}
                     />
@@ -105,7 +105,7 @@ const FormInner: FormComponent = (
                         rules={{
                             required: field.required,
                             validate: validates?.[key]
-                                ? data => validates?.[key]?.(data, getValues())
+                                ? (data, fields) => validates?.[key]?.(data, fields)
                                 : undefined,
                         }}
                         render={({ field }) => {
@@ -119,7 +119,12 @@ const FormInner: FormComponent = (
                                     placeholder='asd'
                                     onChange={event =>
                                         field.onChange(
-                                            moment(event.currentTarget.value, serverDateFormat)
+                                            event.currentTarget.value
+                                                ? moment(
+                                                      event.currentTarget.value,
+                                                      serverDateFormat
+                                                  )
+                                                : null
                                         )
                                     }
                                     onBlur={field.onBlur}

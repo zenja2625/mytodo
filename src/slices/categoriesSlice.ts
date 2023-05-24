@@ -1,6 +1,14 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { API } from '../api/api'
-import { CategoriesType, Category, openCategoryEditorProps } from './sliceTypes'
+import {
+    CategoriesType,
+    Category,
+    IState,
+    openCategoryEditorProps,
+    RejectValueType,
+} from './sliceTypes'
+
+import { redirect } from 'react-router-dom'
 
 const initialState: CategoriesType = {
     items: [],
@@ -18,12 +26,31 @@ export const getCategoriesThunk = createAsyncThunk(
     }
 )
 
-export const createCategoryThunk = createAsyncThunk(
+export const createCategoryThunk = createAsyncThunk<string, string, IState & RejectValueType>(
     'categories/createCategory',
     async (payload: string, thunkAPI) => {
         try {
+            let state = thunkAPI.getState()
+            const categoryIds = state.categories.items.reduce(
+                (acc, curr) => ((acc[curr.id] = true), acc),
+                {} as { [key: string]: boolean }
+            )
+
             await API.categories.createCategory({ name: payload })
-            thunkAPI.dispatch(getCategoriesThunk())
+            await thunkAPI.dispatch(getCategoriesThunk())
+
+            state = thunkAPI.getState()
+
+            for (let i = 0; i < state.categories.items.length; i++) {
+                const category = state.categories.items[i]
+
+                if (categoryIds[category.id] !== true) {
+                    if (category.name === payload) return thunkAPI.fulfillWithValue(category.id)
+                    break
+                }
+            }
+
+            return thunkAPI.fulfillWithValue('')
         } catch (error: any) {
             return thunkAPI.rejectWithValue(error.response?.status)
         }

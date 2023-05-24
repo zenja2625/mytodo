@@ -2,7 +2,6 @@ import { Path, PathValue, ValidationRule } from 'react-hook-form'
 import { Moment } from 'moment'
 
 type FieldBase = {
-    minLength?: ValidationRule<number>
     placeholder?: string
 }
 
@@ -15,11 +14,11 @@ type OptionalField = {
 
 export type TextFieldBase = {
     type: 'text' | 'password'
+    minLength?: ValidationRule<number>
 } & FieldBase
 
 export type DateFieldBase = {
     type: 'date'
-    minDate?: 'asdasd'
 } & FieldBase
 
 type KeysMatching<T> = { [K in keyof T]: T[K] extends OptionalField ? K : never }[keyof T]
@@ -32,13 +31,9 @@ export type OptionalDateField = DateFieldBase & OptionalField
 
 export type Field = TextField | DateField | OptionalTextField | OptionalDateField
 
-
-
 export type Items = {
     [key: string]: Field
 }
-
- 
 
 export type ItemDataType<T> = T extends TextFieldBase
     ? string

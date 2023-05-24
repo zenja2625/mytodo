@@ -10,7 +10,8 @@ export const TodoItem: FC<{
     categoryId: string
     handleProps?: DragHandleProps
     openEditModal: (id: string, defaultValues?: PutTodoDTO) => void
-}> = ({ item, categoryId, handleProps, openEditModal }) => {
+    openAddModal: (overId?: string, addBefore?: boolean) => void
+}> = ({ item, categoryId, handleProps, openEditModal, openAddModal }) => {
     const dispatch = useAppDispatch()
 
     const { id, value, taskEnd } = item
@@ -64,12 +65,13 @@ export const TodoItem: FC<{
                 {item.id}
             </div>
             <div>
-                {item.value} <div>{item.taskEnd?.format(appDateFormat)}</div>
+                {item.value} <div>{item.taskEnd && item.taskEnd.format(appDateFormat)}</div>
             </div>
             {
                 <>
                     <button
                         onClick={() => {
+                            openAddModal(id, true)
                             // openEditor(false, true)
                         }}
                     >
@@ -77,6 +79,7 @@ export const TodoItem: FC<{
                     </button>
                     <button
                         onClick={() => {
+                            openAddModal(id)
                             // openEditor(false)
                         }}
                     >

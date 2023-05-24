@@ -1,4 +1,4 @@
-import { useContext, useRef } from 'react'
+import { useCallback, useContext, useRef } from 'react'
 import { modalContext } from './ModalProvider'
 import { Form, FormRef } from '../form/Form'
 import { FormData, Items, PartialFormData } from '../form/types'
@@ -9,36 +9,39 @@ export const useModal = <T extends Items>(items: T) => {
 
     const { openModal } = useContext(modalContext)
 
-    return (
-        onSubmit: (data: PartialFormData<T>) => Promise<void>,
-        title: string,
-        buttonValue?: string,
-        defaultValues?: DeepPartial<FormData<T>>
-    ) => {
-        const inputs = (
-            <Form
-                ref={ref}
-                fields={items}
-                onSubmit={onSubmit}
-                hideButton={true}
-                defaultValues={defaultValues}
-            />
-        )
-
-        const subscribe = (
-            updateFormStatus: (
-                isButtonDisabled: boolean,
-                isSubmitting: boolean,
-                isSubmitSuccessful: boolean
-            ) => void
+    return useCallback(
+        (
+            onSubmit: (data: PartialFormData<T>) => Promise<void>,
+            title: string,
+            buttonValue?: string,
+            defaultValues?: DeepPartial<FormData<T>>
         ) => {
-            ref.current?.subscribeFormCheck(updateFormStatus)
-        }
+            const content = (
+                <Form
+                    ref={ref}
+                    fields={items}
+                    onSubmit={onSubmit}
+                    hideButton={true}
+                    defaultValues={defaultValues}
+                />
+            )
 
-        const submit = () => {
-            ref.current?.submit()
-        }
+            const subscribe = (
+                updateFormStatus: (
+                    isButtonDisabled: boolean,
+                    isSubmitting: boolean,
+                    isSubmitSuccessful: boolean
+                ) => void
+            ) => {
+                ref.current?.subscribeFormCheck(updateFormStatus)
+            }
 
-        openModal(inputs, title, submit, subscribe, buttonValue)
-    }
+            const submit = async () => {
+                await ref.current?.submit()
+            }
+
+            openModal(content, title, submit, subscribe, buttonValue)
+        },
+        [openModal]
+    )
 }

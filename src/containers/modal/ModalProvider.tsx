@@ -12,7 +12,7 @@ export type ModalContextInitialValueProps = {
     openModal: (
         content: JSX.Element,
         title: string,
-        submit: () => void,
+        submit: () => Promise<void>,
         subscribeFromStatus: (
             updateFormStatus: (
                 isButtonDisabled: boolean,

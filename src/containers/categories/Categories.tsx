@@ -6,7 +6,7 @@ import { CategoryRequestDTO } from '../../api/apiTypes'
 import { useModal } from '../modal/useModal'
 import { categoryFields } from '../../forms'
 import { DeepPartial } from 'react-hook-form'
-type asd = { name: string }
+import { useNavigate } from 'react-router-dom'
 
 export const Categories = () => {
     const categories = useAppSelector(state => state.categories.items)
@@ -14,13 +14,20 @@ export const Categories = () => {
 
     const dispatch = useAppDispatch()
 
+    const navigate = useNavigate()
+
     const open = useModal(categoryFields)
 
     const className = 'categories' + (siderCollapsed ? ' hidden' : '')
 
-    const onCreateSubmit = useCallback(async (data: CategoryRequestDTO) => {
-        await dispatch(createCategoryThunk(data.name))
-    }, [])
+    const onCreateSubmit = useCallback(
+        async (data: CategoryRequestDTO) => {
+            const response = await dispatch(createCategoryThunk(data.name))
+
+            navigate(`/category/${response.payload}`)
+        },
+        [navigate, dispatch]
+    )
 
     const openCreateEditor = () => {
         open(onCreateSubmit, 'Create Category', 'Create')

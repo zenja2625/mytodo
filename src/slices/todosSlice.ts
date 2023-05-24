@@ -40,7 +40,6 @@ type DeleteTodoProps = {
 
 type GetTodosProps = {
     categoryId: string
-    withCompleted: boolean
 }
 
 export type MoveTodoProps = {
@@ -51,18 +50,20 @@ export type MoveTodoProps = {
 
 export const depthIndent = 40
 
-export const getTodosThunk = createAsyncThunk(
-    'todos/getTodosThunk',
-    async (payload: GetTodosProps, { rejectWithValue }) => {
-        try {
-            const response = await API.todos.getTodos(payload.categoryId, payload.withCompleted)
+export const getTodosThunk = createAsyncThunk<
+    Array<TodoDTO>,
+    GetTodosProps,
+    IState & RejectValueType
+>('todos/getTodosThunk', async (payload, { getState, rejectWithValue }) => {
+    try {
+        const state = getState()
+        const response = await API.todos.getTodos(payload.categoryId, state.todos.withCompleted)
 
-            return response.data as Array<TodoDTO>
-        } catch (error: any) {
-            return rejectWithValue(error.response?.status)
-        }
+        return response.data as Array<TodoDTO>
+    } catch (error: any) {
+        return rejectWithValue(error.response?.status)
     }
-)
+})
 
 export const updatePositionsThunk = createAsyncThunk<void, string, IState & RejectValueType>(
     'todos/updatePositionsThunk',
@@ -101,14 +102,13 @@ export const createTodoThunk = createAsyncThunk<void, CreateTodoProps, IState & 
     async (payload, { getState, rejectWithValue, dispatch }) => {
         try {
             const todos = getState().todos.items
-            const withCompleted = getState().todos.withCompleted
 
             await API.todos.createTodo(payload.categoryId, {
                 value: payload.value,
                 taskEnd: payload.taskEnd,
                 ...getTodoPosition(todos, payload.overId, payload.addBefore),
             })
-            await dispatch(getTodosThunk({ categoryId: payload.categoryId, withCompleted }))
+            await dispatch(getTodosThunk({ categoryId: payload.categoryId }))
         } catch (error: any) {
             return rejectWithValue(error.response?.status)
         }
