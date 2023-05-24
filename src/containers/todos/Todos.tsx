@@ -99,7 +99,7 @@ export const Todos: FC<{ selectedCategory: Category }> = ({ selectedCategory }) 
     useEffect(() => {
         const categoryId = selectedCategory.id
 
-        dispatch(getTodosThunk({ categoryId }))
+        dispatch(getTodosThunk({ category :selectedCategory }))
     }, [selectedCategory, dispatch])
 
     const onDrop = useCallback(

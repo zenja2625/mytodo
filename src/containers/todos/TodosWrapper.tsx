@@ -12,6 +12,7 @@ export const TodosWrapper = () => {
     const { categoryId } = useParams<CategoryParamsType>()
     const navigate = useNavigate()
 
+    const selectedCategory = useAppSelector(state => state.todos.selectedCategory)
     const categories = useAppSelector(state => state.categories.items)
     const todosRequestId = useAppSelector(state => state.todos.todosRequestId)
 
@@ -19,7 +20,7 @@ export const TodosWrapper = () => {
 
     const dispatch = useAppDispatch()
 
-    const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
+    //const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
 
     // const selectedCategory = useMemo(
     //     () => categoryId && categories.find(category => category.id === categoryId),
@@ -27,16 +28,12 @@ export const TodosWrapper = () => {
     // )
 
     useEffect(() => {
-        const foo = async (selectedCategory: Category) => {
-            await dispatch(getTodosThunk({ categoryId: selectedCategory.id }))
-            setSelectedCategory(selectedCategory)
-        }
 
-        const a1 = categoryId && categories.find(category => category.id === categoryId)
+        const selectedCategory = categoryId && categories.find(category => category.id === categoryId)
 
-        if (a1) foo(a1)
+        if (selectedCategory) dispatch(getTodosThunk({ category: selectedCategory }))
         else if (categoryId) navigate('/', { replace: true })
-    }, [categoryId, selectedCategory, navigate])
+    }, [categoryId, categories, navigate, dispatch])
 
     return selectedCategory ? (
         <Todos selectedCategory={selectedCategory} />
