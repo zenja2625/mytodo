@@ -8,10 +8,9 @@ import {
     RejectValueType,
 } from './sliceTypes'
 
-import { redirect } from 'react-router-dom'
-
 const initialState: CategoriesType = {
     items: [],
+    selected: null,
 }
 
 export const getCategoriesThunk = createAsyncThunk(
@@ -45,7 +44,11 @@ export const createCategoryThunk = createAsyncThunk<string, string, IState & Rej
                 const category = state.categories.items[i]
 
                 if (categoryIds[category.id] !== true) {
-                    if (category.name === payload) return thunkAPI.fulfillWithValue(category.id)
+                    if (category.name === payload) {
+                        setSelectedCategory(category)
+
+                        return thunkAPI.fulfillWithValue(category.id)
+                    }
                     break
                 }
             }
@@ -85,10 +88,17 @@ export const categoriesSlice = createSlice({
     name: 'categories',
     initialState,
     reducers: {
+        setSelectedCategory: (state, action: PayloadAction<Category | null>) => {
+            state.selected = action.payload
+        },
         deleteCategory: (state, action: PayloadAction<string>) => {
             const index = state.items.findIndex(category => category.id === action.payload)
             state.items.splice(index, 1)
         },
+        setCategories:(state, action: PayloadAction<string>) => {
+            const index = state.items.findIndex(category => category.id === action.payload)
+            state.items.splice(index, 1)
+        }
     },
     extraReducers: builder => {
         builder.addCase(getCategoriesThunk.fulfilled, (state, action) => {
@@ -101,4 +111,4 @@ export const categoriesSlice = createSlice({
     },
 })
 
-export const { deleteCategory } = categoriesSlice.actions
+export const { deleteCategory, setSelectedCategory,setCategories } = categoriesSlice.actions

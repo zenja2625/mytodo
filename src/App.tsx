@@ -5,7 +5,7 @@ import { Header } from './containers/Header'
 import { LoadPage } from './containers/LoadPage'
 import { Main } from './containers/Main'
 import { NotFoundPage } from './containers/NotFoundPage'
-import { RedirectAuth } from './containers/utils/RedirectAuth'
+import { RedirectAuth, SelectedCategory } from './containers/utils/RedirectAuth'
 import { RequireAuth } from './containers/utils/RequireAuth'
 import { Login } from './containers/account/Login'
 import { initializeApp } from './slices/appSlice'
@@ -39,8 +39,10 @@ export const App = () => {
                 </Route>
 
                 <Route element={<RequireAuth />}>
-                    <Route path='/' element={<Main />} />
-                    <Route path='/category/:categoryId' element={<Main />} />
+                    <Route element={<SelectedCategory />}>
+                        <Route path='/' element={<Main />} />
+                        <Route path='/category/:categoryId' element={<Main />} />
+                    </Route>
                 </Route>
 
                 <Route path='*' element={<NotFoundPage />} />

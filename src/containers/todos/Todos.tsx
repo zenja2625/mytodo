@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo } from 'react'
+import { FC, memo, useCallback, useEffect, useMemo } from 'react'
 import { useAppDispatch, useAppSelector } from '../../slices/store'
 import {
     createTodoThunk,
@@ -20,8 +20,9 @@ import { useDebounce } from '../../hooks/useDebounce'
 import { TodoPositionDTO, TodoStatusDTO } from '../../api/apiTypes'
 import { useModal } from '../modal/useModal'
 import { todoFields } from '../../forms'
+import { areEqual } from 'react-window'
 
-export const Todos: FC<{ selectedCategory: Category }> = ({ selectedCategory }) => {
+export const Todos = memo(({ selectedCategory }: { selectedCategory: Category }) => {
     const withCompleted = useAppSelector(state => state.todos.withCompleted)
     const todos = useAppSelector(getTodos)
 
@@ -78,7 +79,6 @@ export const Todos: FC<{ selectedCategory: Category }> = ({ selectedCategory }) 
         [selectedCategory, dispatch, openModal]
     )
 
-
     const fetchPositions = useCallback(
         (positions: Array<TodoPositionDTO>) => {
             if (positions.length) dispatch(updatePositionsThunk(selectedCategory.id))
@@ -96,18 +96,16 @@ export const Todos: FC<{ selectedCategory: Category }> = ({ selectedCategory }) 
     useDebounce(statuses, 200, fetchStatuses)
     useDebounce(positions, 200, fetchPositions)
 
-    useEffect(() => {
-        const categoryId = selectedCategory.id
-
-        dispatch(getTodosThunk({ category :selectedCategory }))
-    }, [selectedCategory, dispatch])
-
     const onDrop = useCallback(
         (id: string, overId: string, depth: number) => {
             dispatch(moveTodo({ id, overId, depth }))
         },
         [dispatch]
     )
+
+    useEffect(() => {
+        console.log('set Todos')
+    }, [todos])
 
     useEffect(() => {
         console.log('Todos')
@@ -150,25 +148,25 @@ export const Todos: FC<{ selectedCategory: Category }> = ({ selectedCategory }) 
     // if (showLoadPage) return <LoadPage />
 
     return (
-        <div className='todos'>
-            <SortableTree
-                items={todos}
-                itemHeight={44}
-                gap={10}
-                renderItem={(item, handleProps) => (
-                    <TodoItem
-                        item={item}
-                        handleProps={handleProps}
-                        categoryId={selectedCategory.id}
-                        openEditModal={openUpdateModal}
-                        openAddModal={openCreateModal}
-                    />
-                )}
-                renderOverlay={item => <TodoItem1 item={item} />}
-                onDrop={onDrop}
-                header={header}
-                footer={footer}
-            />
-        </div>
+        // <div className='todos'>
+        <SortableTree
+            items={todos}
+            itemHeight={44}
+            gap={10}
+            renderItem={(item, handleProps) => (
+                <TodoItem
+                    item={item}
+                    handleProps={handleProps}
+                    categoryId={selectedCategory.id}
+                    openEditModal={openUpdateModal}
+                    openAddModal={openCreateModal}
+                />
+            )}
+            renderOverlay={item => <TodoItem1 item={item} />}
+            onDrop={onDrop}
+            header={header}
+            footer={footer}
+        />
+        // </div>
     )
-}
+}, areEqual)

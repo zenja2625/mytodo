@@ -59,6 +59,7 @@ export interface IEditor<T> {
 
 export type CategoriesType = {
     items: Array<Category>
+    selected: Category | null
 }
 
 export type TodoDragType = {

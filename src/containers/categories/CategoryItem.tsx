@@ -3,20 +3,26 @@ import { Category } from '../../slices/sliceTypes'
 import { useNavigate } from 'react-router-dom'
 import { DeepPartial, DefaultValues } from 'react-hook-form'
 import { useAppDispatch } from '../../slices/store'
-import { deleteCategoryThunk, updateCategoryThunk } from '../../slices/categoriesSlice'
+import {
+    deleteCategoryThunk,
+    setSelectedCategory,
+    updateCategoryThunk,
+} from '../../slices/categoriesSlice'
 import { CategoryRequestDTO } from '../../api/apiTypes'
 
 export const CategoryItem: FC<
     Category & {
         openEdit: (id: string, defaultValues: DeepPartial<CategoryRequestDTO>) => void
+        selected?: boolean
     }
-> = ({ id, name, openEdit }) => {
+> = ({ id, name, selected, openEdit }) => {
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
 
     // const { openModal } = useContext(modalContext)
 
     const onClick = useCallback(() => {
+        // dispatch(setSelectedCategory({ id, name }))
         navigate(`/category/${id}`)
     }, [id, navigate])
 
@@ -40,7 +46,7 @@ export const CategoryItem: FC<
     // }
 
     return (
-        <div onClick={onClick}>
+        <div style={{ backgroundColor: selected ? 'red' : undefined }} onClick={onClick}>
             {name}
             <button
                 onClick={() => {
