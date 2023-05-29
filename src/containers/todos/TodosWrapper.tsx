@@ -33,64 +33,13 @@ export const TodosWrapper = () => {
     const dispatch = useAppDispatch()
 
 
-    useEffect(() => {
-      console.log('Set Selected');
-      
-    }, [selected])
-    
-
-
-    // useEffect(() => {
-    //     console.log(selected?.name)
-    // }, [selected])
-
-    //const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
-
-    // const selectedCategory = useMemo(
-    //     () => categoryId && categories.find(category => category.id === categoryId),
-    //     [categoryId, categories]
-    // )
-
-    // useEffect(() => {
-    //     const selectedCategory =
-    //         categoryId && categories.find(category => category.id === categoryId)
-
-    //     // console.log('useEffect')
-
-    //     if (selectedCategory) {
-    //         if (selectedCategory.id !== categoryId) dispatch(getTodosThunk({ selectedCategory }))
-    //     } else if (categoryId) navigate('/', { replace: true })
-    // }, [categoryId, categories, navigate, dispatch])
-
-    // useEffect(() => {
-    //     if (categoryId && !categories.find(category => category.id === categoryId)) {
-    //         console.log('Redirect')
-    //     }
-    // }, [categoryId, categories])
-
-    // useEffect(() => {
-    //     console.log('selected')
-    // }, [selected])
-
-    // useEffect(() => {
-    //     console.log('categories')
-    // }, [categories])
-
-    // useEffect(() => {
-    //     console.log('categoryId')
-    // }, [categoryId])
-
-    // useEffect(() => {
-    //     console.log('Todo Wrapper')
-    // })
-
     return (
         <div className='todos'>
             {showLoadPage ? (
                 <div>Loading...</div>
             ) : 
-            selectedCategory ? (
-                <Todos selectedCategory={selectedCategory} />
+            selected ? (
+                <Todos selectedCategory={selected} />
             ) : (
                 <div>Choose Category</div>
             )}

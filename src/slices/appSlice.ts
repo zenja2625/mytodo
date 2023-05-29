@@ -3,11 +3,12 @@ import { Action, AnyAction, createAsyncThunk, createSlice } from '@reduxjs/toolk
 import { loginThunk, userInfoThunk } from './accountSlice'
 import { AppType, IState } from './sliceTypes'
 import { getCategoriesThunk } from './categoriesSlice'
+import { getTodosThunk } from './todosSlice'
 
 const initialState: AppType = {
     initialized: false,
     requestCount: 0,
-    siderCollapsed: true
+    siderCollapsed: true,
 }
 
 interface RejectedAction extends Action {
@@ -23,13 +24,17 @@ const isStartLoading = (action: AnyAction) => action.type.endsWith('pending')
 const isEndLoading = (action: AnyAction) =>
     action.type.endsWith('fulfilled') || action.type.endsWith('rejected')
 
-
-export const initializeApp = createAsyncThunk<void, void, IState>(
+export const initializeApp = createAsyncThunk<void, string | undefined, IState>(
     'app/initializeApp',
-    async (_, { dispatch, getState }) => {
+    async (categoryId, { dispatch, getState }) => {
         await dispatch(userInfoThunk())
-        if (getState().account.isAuth)
-            await dispatch(getCategoriesThunk())
+
+        if (getState().account.isAuth) await dispatch(getCategoriesThunk())
+        if (categoryId) {
+            const categories = getState().categories.items
+            const selectedCategory = categories.find(category => category.id === categoryId) || null
+            if (selectedCategory) await dispatch(getTodosThunk({ selectedCategory }))
+        }
     }
 )
 
@@ -37,16 +42,21 @@ export const appSlice = createSlice({
     name: 'app',
     initialState,
     reducers: {
+        initialization: state => {
+            state.initialized = true
+        },
         deinitialization: state => {
             state.initialized = false
         },
         toggleSider: state => {
             state.siderCollapsed = !state.siderCollapsed
-        }
+        },
     },
     extraReducers: builder => {
         builder.addCase(initializeApp.fulfilled, state => {
             state.initialized = true
+            console.log('Set Initialize');
+            
         })
         builder.addMatcher(isStartLoading, state => {
             state.requestCount++
@@ -81,4 +91,4 @@ export const appSlice = createSlice({
     },
 })
 
-export const { deinitialization, toggleSider } = appSlice.actions
+export const { initialization, deinitialization, toggleSider } = appSlice.actions

@@ -13,21 +13,34 @@ const initialState: CategoriesType = {
     selected: null,
 }
 
-export const getCategoriesThunk = createAsyncThunk(
-    'categories/getCategories',
-    async (_, thunkAPI) => {
-        try {
-            const response = await API.categories.getCategories()
-            return response.data as Array<Category>
-        } catch (error: any) {
-            return thunkAPI.rejectWithValue(error.response?.status)
+type GetCategoriesThunkReturn = {
+    categories: Array<Category>
+    // selectedCategory: Category | null
+}
+
+export const getCategoriesThunk = createAsyncThunk<
+    GetCategoriesThunkReturn,
+    string | undefined,
+    IState & RejectValueType
+>('categories/getCategories', async (categoryId, thunkAPI) => {
+    try {
+        const response = await API.categories.getCategories()
+        const categories = response.data as Array<Category>
+
+        const selectedCategory = categories.find(category => category.id === categoryId) || null
+
+        return {
+            categories,
+            // selectedCategory,
         }
+    } catch (error: any) {
+        return thunkAPI.rejectWithValue(error.response?.status)
     }
-)
+})
 
 export const createCategoryThunk = createAsyncThunk<string, string, IState & RejectValueType>(
     'categories/createCategory',
-    async (payload: string, thunkAPI) => {
+    async (payload, thunkAPI) => {
         try {
             let state = thunkAPI.getState()
             const categoryIds = state.categories.items.reduce(
@@ -95,14 +108,18 @@ export const categoriesSlice = createSlice({
             const index = state.items.findIndex(category => category.id === action.payload)
             state.items.splice(index, 1)
         },
-        setCategories:(state, action: PayloadAction<string>) => {
+        setCategories: (state, action: PayloadAction<string>) => {
             const index = state.items.findIndex(category => category.id === action.payload)
             state.items.splice(index, 1)
-        }
+        },
+        clearSelectedCategory: state => {
+            state.selected = null
+        },
     },
     extraReducers: builder => {
         builder.addCase(getCategoriesThunk.fulfilled, (state, action) => {
-            state.items = action.payload
+            state.items = action.payload.categories
+            // state.selected = action.payload.selectedCategory
         })
         builder.addCase(updateCategoryThunk.fulfilled, (state, action) => {
             const index = state.items.findIndex(category => category.id === action.payload.id)
@@ -111,4 +128,5 @@ export const categoriesSlice = createSlice({
     },
 })
 
-export const { deleteCategory, setSelectedCategory,setCategories } = categoriesSlice.actions
+export const { deleteCategory, setSelectedCategory, setCategories, clearSelectedCategory } =
+    categoriesSlice.actions

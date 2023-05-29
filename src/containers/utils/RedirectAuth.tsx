@@ -1,17 +1,9 @@
-import {
-    Navigate,
-    Outlet,
-    matchPath,
-    useLocation,
-    useMatch,
-    useNavigate,
-    useParams,
-} from 'react-router-dom'
+import { Navigate, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../slices/store'
 import { CategoryParamsType } from '../types'
-import { useEffect } from 'react'
-import { setSelectedCategory } from '../../slices/categoriesSlice'
-import { getTodosThunk } from '../../slices/todosSlice'
+import { useEffect, useMemo, useRef } from 'react'
+import { clearSelectedCategory } from '../../slices/categoriesSlice'
+import { clearTodos, getTodosThunk } from '../../slices/todosSlice'
 
 export const RedirectAuth = () => {
     const isAuth = useAppSelector(state => state.account.isAuth)
@@ -23,60 +15,48 @@ export const RedirectAuth = () => {
     return !isAuth ? <Outlet /> : <Navigate to={from} replace />
 }
 
+export const useValueChangeEvent = <T,>(changeValue: T, changeEvent: (prev: T) => void) => {
+    const ref = useRef<T>(changeValue)
+
+    useEffect(() => {
+        if (changeValue !== ref.current) {
+            changeEvent(ref.current)
+            ref.current = changeValue
+        }
+    }, [changeValue, changeEvent])
+}
+
 export const SelectedCategory = () => {
-    const location = useLocation()
     const navigate = useNavigate()
 
     const { categoryId } = useParams<CategoryParamsType>()
-    const selectedCategory = useAppSelector(state => state.categories.selected)
     const categories = useAppSelector(state => state.categories.items)
+    const selectedCategory = useAppSelector(state => state.categories.selected)
 
     const dispatch = useAppDispatch()
 
-    ////location.state?.from?.pathname
+    const category = useMemo(
+        () => (categoryId && categories.find(category => category.id === categoryId)) || null,
+        [categoryId, categories]
+    )
 
     useEffect(() => {
         if (categoryId !== selectedCategory?.id) {
-
-            const category = categories.find(category => category.id === categoryId)
-
-            if (category)
-                dispatch(getTodosThunk({selectedCategory: category}))
-
+            if (category) {
+                dispatch(getTodosThunk({ selectedCategory: category }))
+            } else {
+                if (categoryId) {
+                    console.log('');
+                    
+                    navigate('/', { replace: true })
+                }
+                else if (selectedCategory) {
+                    dispatch(clearTodos())
+                    dispatch(clearSelectedCategory())
+                }
+            }
         }
-    }, [categoryId, categories, selectedCategory])
-
-    
-
-    // useEffect(() => {
-    //     if (categoryId !== selectedCategory?.id) {
-    //         const prevCategoryId = matchPath(
-    //             '/category/:categoryId',
-    //             location.state?.from?.pathname || ''
-    //         )?.params.categoryId
-
-    //         if (prevCategoryId === selectedCategory?.id) {
-    //             //param
-    //             console.log('use Param')
-
-    //             const category = categories.find(category => category.id === categoryId)
-
-    //             dispatch(setSelectedCategory(category || null))
-    //         } else {
-    //             //state
-    //             console.log('use State');
-
-    //             navigate(`/category/${selectedCategory?.id}`, { state: { from: location } })
-    //         }
-    //     }
-    // })
-
-    console.log(
-        `param ${categoryId} prevParam ${location.state} selected ${selectedCategory?.id}`
-    )
-    // console.log(
-    //     `param ${categoryId} prevParam ${location.state?.from?.pathname} selected ${selectedCategory?.id}`
-    // )
+    }, [categoryId, category, selectedCategory, dispatch, navigate])
 
     return <Outlet />
 }

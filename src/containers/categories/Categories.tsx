@@ -14,7 +14,10 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { CategoryParamsType } from '../types'
 
 export const Categories = () => {
-    const selectedCategory = useAppSelector(state => state.categories.selected)
+    const { categoryId } = useParams<CategoryParamsType>()
+
+
+    // const selectedCategory = useAppSelector(state => state.categories.selected)
     const categories = useAppSelector(state => state.categories.items)
     const siderCollapsed = useAppSelector(state => state.app.siderCollapsed)
 
@@ -58,8 +61,10 @@ export const Categories = () => {
         <div className={className}>
             Categories:
             {categories.map(item => (
-                <CategoryItem key={item.id} {...item} selected={item.id === selectedCategory?.id} openEdit={openEditEditor} />
+                <CategoryItem key={item.id} {...item} selected={item.id === categoryId} openEdit={openEditEditor} />
             ))}
+                <CategoryItem id='asd' name='Test' openEdit={openEditEditor} />
+
             <button onClick={() => openCreateEditor()}>Новая Категория</button>
         </div>
     )

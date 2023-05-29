@@ -104,11 +104,11 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
     )
 
     useEffect(() => {
-        console.log('set Todos')
+        // console.log('set Todos')
     }, [todos])
 
     useEffect(() => {
-        console.log('Todos')
+        // console.log('Todos')
     })
 
     // useEffect(() => {
