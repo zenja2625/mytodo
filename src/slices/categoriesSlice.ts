@@ -49,23 +49,28 @@ export const createCategoryThunk = createAsyncThunk<string, string, IState & Rej
             )
 
             await API.categories.createCategory({ name: payload })
-            await thunkAPI.dispatch(getCategoriesThunk())
+            
+            // const response = await API.categories.getCategories()
+            // const categories = response.data as Array<Category>
 
-            state = thunkAPI.getState()
+            // // await thunkAPI.dispatch(getCategoriesThunk())
 
-            for (let i = 0; i < state.categories.items.length; i++) {
-                const category = state.categories.items[i]
+            // state = thunkAPI.getState()
 
-                if (categoryIds[category.id] !== true) {
-                    if (category.name === payload) {
-                        setSelectedCategory(category)
+            // for (let i = 0; i < categories.length; i++) {
+            //     const category = categories[i]
 
-                        return thunkAPI.fulfillWithValue(category.id)
-                    }
-                    break
-                }
-            }
+            //     if (categoryIds[category.id] !== true) {
+            //         if (category.name === payload) {
 
+            //             // setSelectedCategory(category)
+
+            //             return thunkAPI.fulfillWithValue(category.id)
+            //         }
+            //         break
+            //     }
+            // }
+            
             return thunkAPI.fulfillWithValue('')
         } catch (error: any) {
             return thunkAPI.rejectWithValue(error.response?.status)

@@ -19,8 +19,8 @@ export const Header = () => {
                 </button>
                 <div
                     onClick={() => {
-                        dispatch(setSelectedCategory(null))
-                        // navigate('/')
+                        // dispatch(setSelectedCategory(null))
+                        navigate('/')
                     }}
                 >
                     MyTodo

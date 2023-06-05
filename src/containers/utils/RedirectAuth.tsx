@@ -27,6 +27,8 @@ export const useValueChangeEvent = <T,>(changeValue: T, changeEvent: (prev: T) =
 }
 
 export const SelectedCategory = () => {
+    const prevCategoryIdRef = useRef<string>()
+
     const navigate = useNavigate()
 
     const { categoryId } = useParams<CategoryParamsType>()
@@ -35,28 +37,45 @@ export const SelectedCategory = () => {
 
     const dispatch = useAppDispatch()
 
-    const category = useMemo(
-        () => (categoryId && categories.find(category => category.id === categoryId)) || null,
-        [categoryId, categories]
-    )
+    useEffect(() => {
+        console.log('selectedCategory')
+    }, [selectedCategory])
 
     useEffect(() => {
-        if (categoryId !== selectedCategory?.id) {
-            if (category) {
-                dispatch(getTodosThunk({ selectedCategory: category }))
-            } else {
-                if (categoryId) {
-                    console.log('');
-                    
-                    navigate('/', { replace: true })
-                }
-                else if (selectedCategory) {
-                    dispatch(clearTodos())
-                    dispatch(clearSelectedCategory())
-                }
-            }
-        }
-    }, [categoryId, category, selectedCategory, dispatch, navigate])
+        console.log(categoryId)
+    }, [categoryId])
+
+    useEffect(() => {
+        console.log('use Effect')
+    })
+
+    // useEffect(() => {
+    //     if (prevCategoryIdRef.current !== categoryId) {
+    //         console.log(`Dispatch ${categoryId}`)
+
+    //         if (categoryId) {
+    //             const category = categories.find(category => category.id === categoryId)
+
+    //             if (category) {
+    //                 if (selectedCategory?.id !== category.id)
+    //                     dispatch(getTodosThunk({ selectedCategory: category }))
+
+    //                 prevCategoryIdRef.current = categoryId
+    //             } else {
+    //                 dispatch(clearTodos())
+    //                 dispatch(clearSelectedCategory())
+
+    //                 prevCategoryIdRef.current = undefined
+    //                 navigate('/', { replace: true })
+    //             }
+    //         } else {
+    //             dispatch(clearTodos())
+    //             dispatch(clearSelectedCategory())
+
+    //             prevCategoryIdRef.current = categoryId
+    //         }
+    //     }
+    // }, [categoryId, selectedCategory, dispatch, navigate])
 
     return <Outlet />
 }

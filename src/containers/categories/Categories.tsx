@@ -16,7 +16,6 @@ import { CategoryParamsType } from '../types'
 export const Categories = () => {
     const { categoryId } = useParams<CategoryParamsType>()
 
-
     // const selectedCategory = useAppSelector(state => state.categories.selected)
     const categories = useAppSelector(state => state.categories.items)
     const siderCollapsed = useAppSelector(state => state.app.siderCollapsed)
@@ -30,11 +29,22 @@ export const Categories = () => {
     const className = 'categories' + (siderCollapsed ? ' hidden' : '')
 
     const onCreateSubmit = useCallback(
+        //todo Error handling
         async (data: CategoryRequestDTO) => {
-            const response = await dispatch(createCategoryThunk(data.name))
+            // const response = await dispatch(createCategoryThunk(data.name))
             // dispatch(setSelectedCategory({id: 'asd', name: 'aaa'}))
 
-            navigate(`/category/${response.payload}`)
+            // console.log(response);
+
+            // navigate(`/category/${response.payload}`)
+
+            // const response = await dispatch(createCategoryThunk(data.name))
+            await new Promise(r => setTimeout(r, 1000))
+
+            dispatch(setSelectedCategory({ id: 'asd', name: 'aaa' }))
+            navigate(`/category/155`)
+
+            // await new Promise(r => setTimeout(r, 3000))
         },
         [navigate, dispatch]
     )
@@ -61,10 +71,14 @@ export const Categories = () => {
         <div className={className}>
             Categories:
             {categories.map(item => (
-                <CategoryItem key={item.id} {...item} selected={item.id === categoryId} openEdit={openEditEditor} />
+                <CategoryItem
+                    key={item.id}
+                    {...item}
+                    selected={item.id === categoryId}
+                    openEdit={openEditEditor}
+                />
             ))}
-                <CategoryItem id='asd' name='Test' openEdit={openEditEditor} />
-
+            <CategoryItem id='asd' name='Test' openEdit={openEditEditor} />
             <button onClick={() => openCreateEditor()}>Новая Категория</button>
         </div>
     )
