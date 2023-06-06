@@ -3,6 +3,7 @@ import { logoutThunk } from '../slices/accountSlice'
 import { useAppDispatch, useAppSelector } from '../slices/store'
 import { toggleSider } from '../slices/appSlice'
 import { setSelectedCategory } from '../slices/categoriesSlice'
+import { Link } from 'react-router-dom'
 
 export const Header = () => {
     const navigate = useNavigate()
@@ -19,7 +20,6 @@ export const Header = () => {
                 </button>
                 <div
                     onClick={() => {
-                        // dispatch(setSelectedCategory(null))
                         navigate('/')
                     }}
                 >
@@ -28,8 +28,20 @@ export const Header = () => {
             </div>
             {!isAuth ? (
                 <div>
-                    <button onClick={() => {navigate('/login')}}>Вход</button>
-                    <button onClick={() => {navigate('/register')}}>Регистрация</button>
+                    <button
+                        onClick={() => {
+                            navigate('/login')
+                        }}
+                    >
+                        Вход
+                    </button>
+                    <button
+                        onClick={() => {
+                            navigate('/register')
+                        }}
+                    >
+                        Регистрация
+                    </button>
                 </div>
             ) : (
                 <div>
