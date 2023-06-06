@@ -25,7 +25,6 @@ const initialState: TodosType = {
     items: [],
     todoStatusDTOs: [],
     todoPositionDTOs: [],
-    selectedCategory: null,
     todosRequestId: null,
     withCompleted: false,
 }
@@ -51,28 +50,22 @@ export type MoveTodoProps = {
     depth: number
 }
 
-export const getTodosThunk = createAsyncThunk<
-    { todos: Array<TodoDTO>; selectedCategory: Category },
-    { selectedCategory: Category },
-    IState & RejectValueType
->('todos/getTodosThunk', async (payload, { getState, dispatch, rejectWithValue }) => {
-    try {
-        const state = getState()
-        const response = await API.todos.getTodos(
-            payload.selectedCategory.id,
-            state.todos.withCompleted
-        )
+export const getTodosThunk = createAsyncThunk<Array<TodoDTO>, string, IState & RejectValueType>(
+    'todos/getTodosThunk',
+    async (payload, { getState, rejectWithValue }) => {
+        try {
+            const state = getState()
+            const response = await API.todos.getTodos(
+                payload,
+                state.todos.withCompleted
+            )
 
-        dispatch(setSelectedCategory(payload.selectedCategory))
-
-        return {
-            todos: response.data as Array<TodoDTO>,
-            selectedCategory: payload.selectedCategory,
+            return response.data as Array<TodoDTO>
+        } catch (error: any) {
+            return rejectWithValue(error.response?.status)
         }
-    } catch (error: any) {
-        return rejectWithValue(error.response?.status)
     }
-})
+)
 
 export const updatePositionsThunk = createAsyncThunk<void, string, IState & RejectValueType>(
     'todos/updatePositionsThunk',
@@ -111,7 +104,7 @@ export const createTodoThunk = createAsyncThunk<void, CreateTodoProps, IState & 
     async (payload, { getState, rejectWithValue, dispatch }) => {
         try {
             const todos = getState().todos.items
-            const selectedCategory = getState().todos.selectedCategory
+            const selectedCategory = getState().categories.selected
 
             if (selectedCategory) {
                 await API.todos.createTodo(selectedCategory.id, {
@@ -119,7 +112,7 @@ export const createTodoThunk = createAsyncThunk<void, CreateTodoProps, IState & 
                     taskEnd: payload.taskEnd,
                     ...getTodoPosition(todos, payload.overId, payload.addBefore),
                 })
-                await dispatch(getTodosThunk({ selectedCategory: selectedCategory }))
+                await dispatch(getTodosThunk(selectedCategory.id))
             }
         } catch (error: any) {
             return rejectWithValue(error.response?.status)
@@ -256,8 +249,7 @@ export const todosSlice = createSlice({
             })
             .addCase(getTodosThunk.fulfilled, (state, action) => {
                 if (state.todosRequestId === action.meta.requestId) {
-                    state.items = action.payload.todos
-                    state.selectedCategory = action.payload.selectedCategory
+                    state.items = action.payload
                     state.todosRequestId = null
                 }
             })

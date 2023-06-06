@@ -5,7 +5,7 @@ import { Header } from './containers/Header'
 import { LoadPage } from './containers/LoadPage'
 import { Main } from './containers/Main'
 import { NotFoundPage } from './containers/NotFoundPage'
-import { RedirectAuth, SelectedCategory } from './containers/utils/RedirectAuth'
+import { RedirectAuth } from './containers/utils/RedirectAuth'
 import { RequireAuth } from './containers/utils/RequireAuth'
 import { Login } from './containers/account/Login'
 import { initialization, initializeApp } from './slices/appSlice'
@@ -15,6 +15,7 @@ import { ModalProvider } from './containers/modal/ModalProvider'
 import { CategoryParamsType } from './containers/types'
 import { userInfo } from 'os'
 import { userInfoThunk } from './slices/accountSlice'
+import { NavigateCategoryId } from './containers/utils/NavigateCategoryId'
 
 export const App = () => {
     // const isAuth = useAppSelector(state => state.account.isAuth)
@@ -39,7 +40,7 @@ export const App = () => {
                     </Route>
 
                     <Route element={<RequireAuth />}>
-                        <Route element={<SelectedCategory />}>
+                        <Route element={<NavigateCategoryId />}>
                             <Route path='/' element={<Main />} />
                             <Route path='/category/:categoryId' element={<Main />} />
                         </Route>

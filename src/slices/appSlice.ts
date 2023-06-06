@@ -2,7 +2,7 @@ import { Action, AnyAction, createAsyncThunk, createSlice } from '@reduxjs/toolk
 // import { message } from 'antd'
 import { loginThunk, userInfoThunk } from './accountSlice'
 import { AppType, IState } from './sliceTypes'
-import { getCategoriesThunk } from './categoriesSlice'
+import { getCategoriesThunk, setSelectedCategory } from './categoriesSlice'
 import { getTodosThunk } from './todosSlice'
 
 const initialState: AppType = {
@@ -33,7 +33,10 @@ export const initializeApp = createAsyncThunk<void, string | undefined, IState>(
         if (categoryId) {
             const categories = getState().categories.items
             const selectedCategory = categories.find(category => category.id === categoryId) || null
-            if (selectedCategory) await dispatch(getTodosThunk({ selectedCategory }))
+            if (selectedCategory) {
+                await dispatch(getTodosThunk(selectedCategory.id))
+                dispatch(setSelectedCategory(selectedCategory))
+            }
         }
     }
 )
@@ -55,8 +58,7 @@ export const appSlice = createSlice({
     extraReducers: builder => {
         builder.addCase(initializeApp.fulfilled, state => {
             state.initialized = true
-            console.log('Set Initialize');
-            
+            console.log('Set Initialize')
         })
         builder.addMatcher(isStartLoading, state => {
             state.requestCount++
@@ -84,6 +86,7 @@ export const appSlice = createSlice({
                     break
                 default:
                     // message.error('Ошибка сервера')
+                    state.initialized = false
                     alert('Ошибка сервера')
                     break
             }

@@ -72,7 +72,6 @@ export type TodosType = {
     items: Array<TodoDTO>
     todoStatusDTOs: Array<TodoStatusDTO>
     todoPositionDTOs: Array<TodoPositionDTO>
-    selectedCategory: Category | null
     withCompleted: boolean
     todosRequestId: string | null
 }

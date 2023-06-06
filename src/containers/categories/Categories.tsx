@@ -14,9 +14,9 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { CategoryParamsType } from '../types'
 
 export const Categories = () => {
-    const { categoryId } = useParams<CategoryParamsType>()
+    // const { categoryId } = useParams<CategoryParamsType>()
 
-    // const selectedCategory = useAppSelector(state => state.categories.selected)
+    const selectedCategory = useAppSelector(state => state.categories.selected)
     const categories = useAppSelector(state => state.categories.items)
     const siderCollapsed = useAppSelector(state => state.app.siderCollapsed)
 
@@ -31,18 +31,18 @@ export const Categories = () => {
     const onCreateSubmit = useCallback(
         //todo Error handling
         async (data: CategoryRequestDTO) => {
-            // const response = await dispatch(createCategoryThunk(data.name))
+            const response = await dispatch(createCategoryThunk(data.name))
             // dispatch(setSelectedCategory({id: 'asd', name: 'aaa'}))
 
             // console.log(response);
 
-            // navigate(`/category/${response.payload}`)
+            if (response.payload) navigate(`/category/${response.payload}`)
 
             // const response = await dispatch(createCategoryThunk(data.name))
-            await new Promise(r => setTimeout(r, 1000))
+            // await new Promise(r => setTimeout(r, 1000))
 
-            dispatch(setSelectedCategory({ id: 'asd', name: 'aaa' }))
-            navigate(`/category/155`)
+            // dispatch(setSelectedCategory({ id: 'asd', name: 'aaa' }))
+            // navigate(`/category/155`)
 
             // await new Promise(r => setTimeout(r, 3000))
         },
@@ -74,7 +74,7 @@ export const Categories = () => {
                 <CategoryItem
                     key={item.id}
                     {...item}
-                    selected={item.id === categoryId}
+                    selected={item.id === selectedCategory?.id}
                     openEdit={openEditEditor}
                 />
             ))}

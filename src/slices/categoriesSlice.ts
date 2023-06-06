@@ -40,40 +40,38 @@ export const getCategoriesThunk = createAsyncThunk<
 
 export const createCategoryThunk = createAsyncThunk<string, string, IState & RejectValueType>(
     'categories/createCategory',
-    async (payload, thunkAPI) => {
+    async (payload, { getState, dispatch, fulfillWithValue, rejectWithValue }) => {
         try {
-            let state = thunkAPI.getState()
+            const state = getState()
             const categoryIds = state.categories.items.reduce(
                 (acc, curr) => ((acc[curr.id] = true), acc),
                 {} as { [key: string]: boolean }
             )
 
             await API.categories.createCategory({ name: payload })
-            
-            // const response = await API.categories.getCategories()
-            // const categories = response.data as Array<Category>
 
-            // // await thunkAPI.dispatch(getCategoriesThunk())
+            const response = await API.categories.getCategories()
+            const categories = response.data as Array<Category>
 
-            // state = thunkAPI.getState()
+            // await thunkAPI.dispatch(getCategoriesThunk())
 
-            // for (let i = 0; i < categories.length; i++) {
-            //     const category = categories[i]
+            for (let i = 0; i < categories.length; i++) {
+                const category = categories[i]
 
-            //     if (categoryIds[category.id] !== true) {
-            //         if (category.name === payload) {
+                if (categoryIds[category.id] !== true) {
+                    if (category.name === payload) {
+                        dispatch(setSelectedCategory(category))
+                        dispatch(ass(categories))
 
-            //             // setSelectedCategory(category)
+                        return fulfillWithValue(category.id)
+                    }
+                    break
+                }
+            }
 
-            //             return thunkAPI.fulfillWithValue(category.id)
-            //         }
-            //         break
-            //     }
-            // }
-            
-            return thunkAPI.fulfillWithValue('')
+            return fulfillWithValue('')
         } catch (error: any) {
-            return thunkAPI.rejectWithValue(error.response?.status)
+            return rejectWithValue(error.response?.status)
         }
     }
 )
@@ -120,6 +118,9 @@ export const categoriesSlice = createSlice({
         clearSelectedCategory: state => {
             state.selected = null
         },
+        ass: (state, action: PayloadAction<Category[]>) => {
+            state.items = action.payload
+        },
     },
     extraReducers: builder => {
         builder.addCase(getCategoriesThunk.fulfilled, (state, action) => {
@@ -133,5 +134,5 @@ export const categoriesSlice = createSlice({
     },
 })
 
-export const { deleteCategory, setSelectedCategory, setCategories, clearSelectedCategory } =
+export const { deleteCategory, setSelectedCategory, setCategories, clearSelectedCategory, ass } =
     categoriesSlice.actions
