@@ -47,13 +47,34 @@ const FormInner: FormComponent = (
         register,
         getValues,
         setValue,
+        setFocus,
+        clearErrors,
+        getFieldState,
+        trigger,
+
         control,
         formState: { errors, isSubmitting, isDirty, isValid, isSubmitSuccessful },
     } = useForm({ mode: 'onTouched', defaultValues })
 
+    const canSubmit = !isSubmitting && isDirty && isValid
+
+    useEffect(() => {
+        if (canSubmit) clearErrors()
+    }, [canSubmit, clearErrors])
+
     useEffect(() => {
         refFormCheck.current(isSubmitting || !isDirty || !isValid, isSubmitting, isSubmitSuccessful)
     }, [isSubmitting, isDirty, isValid, isSubmitSuccessful])
+
+    useEffect(() => {
+        const keys = Object.keys(fields)
+
+        if (keys.length > 0) {
+            const key = keys[0] as Path<FormData<typeof fields>>
+            setFocus(key)
+            console.log('Set Focus')
+        }
+    }, [fields, setFocus])
 
     useImperativeHandle(ref, () => ({
         submit: async () => {
@@ -90,7 +111,8 @@ const FormInner: FormComponent = (
                             minLength: field.minLength,
 
                             validate: validates?.[key]
-                                ? (data, fields) => validates?.[key]?.(data, fields)
+                                ? (data, fields) =>
+                                      validates?.[key]?.(data, fields, trigger, getFieldState)
                                 : undefined,
                         })}
                     />
@@ -105,7 +127,8 @@ const FormInner: FormComponent = (
                         rules={{
                             required: field.required,
                             validate: validates?.[key]
-                                ? (data, fields) => validates?.[key]?.(data, fields)
+                                ? (data, fields) =>
+                                      validates?.[key]?.(data, fields, trigger, getFieldState)
                                 : undefined,
                         }}
                         render={({ field }) => {
@@ -147,7 +170,8 @@ const FormInner: FormComponent = (
                             minLength: field.minLength,
 
                             validate: validates?.[key]
-                                ? data => validates?.[key]?.(data, getValues())
+                                ? (data, fields) =>
+                                      validates?.[key]?.(data, fields, trigger, getFieldState)
                                 : undefined,
                         })}
                     />
@@ -169,11 +193,7 @@ const FormInner: FormComponent = (
             onSubmit={handleSubmit(onSubmit)}
         >
             {inputs}
-            <input
-                hidden={hideButton}
-                disabled={isSubmitting || !isDirty || !isValid}
-                type='submit'
-            />
+            <input hidden={hideButton} disabled={!canSubmit} type='submit' />
         </form>
     )
 }

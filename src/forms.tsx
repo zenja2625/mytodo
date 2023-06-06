@@ -39,6 +39,7 @@ export const registerFields: RegisterFields = {
         type: 'text',
         required: 'This field is required',
         placeholder: 'Login',
+        focus: true
     },
     password: {
         type: 'password',

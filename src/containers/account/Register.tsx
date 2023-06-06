@@ -17,8 +17,19 @@ export const Register = () => {
     )
 
     const validates: Validate<typeof registerFields> = {
-        password(field, fields) {
-            if (field !== fields.confirmPassword) return 'Errors'
+        password(field, fields, trigger, getFieldState) {
+            const { isTouched } = getFieldState('confirmPassword')
+
+            if (isTouched) {
+                if (field !== fields.confirmPassword) {
+                    trigger('confirmPassword')
+                }
+            }
+
+            return undefined
+        },
+        confirmPassword(field, fields) {
+            if (field !== fields.password) return 'Passwords must match'
         },
     }
 

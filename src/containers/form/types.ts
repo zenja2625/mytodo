@@ -1,8 +1,9 @@
-import { Path, PathValue, ValidationRule } from 'react-hook-form'
+import { Path, PathValue, UseFormGetFieldState, UseFormTrigger, ValidationRule } from 'react-hook-form'
 import { Moment } from 'moment'
 
 type FieldBase = {
     placeholder?: string
+    focus?: boolean
 }
 
 type RequiredField = {
@@ -50,8 +51,10 @@ export type PartialFormData<T> = Omit<FormData<T>, KeysMatching<T>> &
 
 export type Validate<T> = Partial<{
     [K in keyof T]: (
-        item: PathValue<FormData<T>, Path<FormData<T>>>,
-        items: FormData<T>
+        field: PathValue<FormData<T>, Path<FormData<T>>>,
+        fields: FormData<T>,
+        trigger: UseFormTrigger<FormData<T>>,
+        getFieldState: UseFormGetFieldState<FormData<T>>
     ) => string | undefined
 }>
 
