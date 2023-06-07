@@ -59,7 +59,7 @@ export const appSlice = createSlice({
     extraReducers: builder => {
         builder.addCase(initializeApp.fulfilled, state => {
             state.initialized = true
-            console.log('Set Initialize')
+            // console.log('Set Initialize')
         })
         builder.addMatcher(isStartLoading, state => {
             state.requestCount++

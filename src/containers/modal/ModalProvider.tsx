@@ -1,6 +1,7 @@
 import {
     PropsWithChildren,
     createContext,
+    memo,
     useCallback,
     useEffect,
     useMemo,
@@ -30,7 +31,7 @@ export const ModalContextInitialValue: ModalContextInitialValueProps = {
 
 export const modalContext = createContext(ModalContextInitialValue)
 
-export const ModalProvider = ({ children }: PropsWithChildren) => {
+export const ModalProvider = memo(({ children }: PropsWithChildren) => {
     const submitRef = useRef<() => void>()
     const subscribeRef =
         useRef<
@@ -151,4 +152,4 @@ export const ModalProvider = ({ children }: PropsWithChildren) => {
             {children}
         </modalContext.Provider>
     )
-}
+})

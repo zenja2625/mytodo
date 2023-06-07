@@ -4,13 +4,17 @@ import { useAppDispatch, useAppSelector } from '../slices/store'
 import { toggleSider } from '../slices/appSlice'
 import { setSelectedCategory } from '../slices/categoriesSlice'
 import { Link } from 'react-router-dom'
+import { memo, useEffect } from 'react'
+import { useLoadDelay } from '../hooks/useLoadDelay'
 
-export const Header = () => {
-    const navigate = useNavigate()
+export const Header = memo(() => {
     const { isAuth, username } = useAppSelector(state => state.account)
     const siderCollapsed = useAppSelector(state => state.app.siderCollapsed)
+    const requestCount = useAppSelector(state => state.app.requestCount)
 
     const dispatch = useAppDispatch()
+
+    const showLoadPage = useLoadDelay(requestCount > 0, 200)
 
     return (
         <div className='header'>
@@ -18,30 +22,17 @@ export const Header = () => {
                 <button onClick={() => dispatch(toggleSider())}>
                     {siderCollapsed ? 'colaps' : 'show'}
                 </button>
-                <div
-                    onClick={() => {
-                        navigate('/')
-                    }}
-                >
-                    MyTodo
-                </div>
+                <Link to='/'>MyTodo</Link>
+                {showLoadPage && <div>Loading...</div>}
             </div>
             {!isAuth ? (
                 <div>
-                    <button
-                        onClick={() => {
-                            navigate('/login')
-                        }}
-                    >
-                        Вход
-                    </button>
-                    <button
-                        onClick={() => {
-                            navigate('/register')
-                        }}
-                    >
-                        Регистрация
-                    </button>
+                    <Link to='/login'>
+                        <button>Вход</button>
+                    </Link>
+                    <Link to='/register'>
+                        <button>Регистрация</button>
+                    </Link>
                 </div>
             ) : (
                 <div>
@@ -57,4 +48,4 @@ export const Header = () => {
             )}
         </div>
     )
-}
+})

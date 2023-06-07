@@ -72,7 +72,7 @@ const FormInner: FormComponent = (
         if (keys.length > 0) {
             const key = keys[0] as Path<FormData<typeof fields>>
             setFocus(key)
-            console.log('Set Focus')
+            // console.log('Set Focus')
         }
     }, [fields, setFocus])
 

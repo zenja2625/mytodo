@@ -6,7 +6,7 @@ export const RedirectAuth = () => {
     const location = useLocation()
     const from = location.state?.from?.pathname || '/'
 
-    console.log('Login')
+    // console.log('Login')
 
     return !isAuth ? <Outlet /> : <Navigate to={from} replace />
 }

@@ -103,14 +103,6 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
         [dispatch]
     )
 
-    useEffect(() => {
-        console.log(withCompleted)
-    }, [withCompleted])
-
-    useEffect(() => {
-        // console.log('Todos')
-    })
-
     // useEffect(() => {
     //     console.log('openModal')
     // }, [openModal])
