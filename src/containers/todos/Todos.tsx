@@ -104,8 +104,8 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
     )
 
     useEffect(() => {
-        // console.log('set Todos')
-    }, [todos])
+        console.log(withCompleted)
+    }, [withCompleted])
 
     useEffect(() => {
         // console.log('Todos')
@@ -124,7 +124,16 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
                 }}
             >
                 {selectedCategory.name}
-                <button onClick={() => dispatch(toggleShowCompletedTodos())}>
+                <button
+                    onClick={() =>
+                        dispatch(
+                            getTodosThunk({
+                                categoryId: selectedCategory.id,
+                                withCompleted: !withCompleted,
+                            })
+                        )
+                    }
+                >
                     {withCompleted ? 'Скрыть' : 'Показать'}
                 </button>
             </div>

@@ -7,6 +7,7 @@ import {
     openCategoryEditorProps,
     RejectValueType,
 } from './sliceTypes'
+import { clearTodos } from './todosSlice'
 
 const initialState: CategoriesType = {
     items: [],
@@ -61,7 +62,8 @@ export const createCategoryThunk = createAsyncThunk<string, string, IState & Rej
                 if (categoryIds[category.id] !== true) {
                     if (category.name === payload) {
                         dispatch(setSelectedCategory(category))
-                        dispatch(ass(categories))
+                        dispatch(setCategories(categories))
+                        dispatch(clearTodos())
 
                         return fulfillWithValue(category.id)
                     }
@@ -111,15 +113,11 @@ export const categoriesSlice = createSlice({
             const index = state.items.findIndex(category => category.id === action.payload)
             state.items.splice(index, 1)
         },
-        setCategories: (state, action: PayloadAction<string>) => {
-            const index = state.items.findIndex(category => category.id === action.payload)
-            state.items.splice(index, 1)
+        setCategories: (state, action: PayloadAction<Array<Category>>) => {
+            state.items = action.payload
         },
         clearSelectedCategory: state => {
             state.selected = null
-        },
-        ass: (state, action: PayloadAction<Category[]>) => {
-            state.items = action.payload
         },
     },
     extraReducers: builder => {
@@ -134,5 +132,5 @@ export const categoriesSlice = createSlice({
     },
 })
 
-export const { deleteCategory, setSelectedCategory, setCategories, clearSelectedCategory, ass } =
+export const { deleteCategory, setSelectedCategory, setCategories, clearSelectedCategory } =
     categoriesSlice.actions

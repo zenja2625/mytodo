@@ -32,9 +32,10 @@ export const initializeApp = createAsyncThunk<void, string | undefined, IState>(
         if (getState().account.isAuth) await dispatch(getCategoriesThunk())
         if (categoryId) {
             const categories = getState().categories.items
+            const withCompleted = getState().todos.withCompleted//todo
             const selectedCategory = categories.find(category => category.id === categoryId) || null
             if (selectedCategory) {
-                await dispatch(getTodosThunk(selectedCategory.id))
+                await dispatch(getTodosThunk({ categoryId: selectedCategory.id, withCompleted }))
                 dispatch(setSelectedCategory(selectedCategory))
             }
         }

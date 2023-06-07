@@ -57,7 +57,9 @@ export const CategoryItem: FC<
                 Edit
             </button>
             <button
-                onClick={() => {
+                onClick={e => {
+                    e.stopPropagation()
+
                     const response = window.confirm('Remove this item')
 
                     if (response) dispatch(deleteCategoryThunk(id))

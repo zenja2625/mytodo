@@ -11,6 +11,7 @@ export const NavigateCategoryId = () => {
     const { categoryId } = useParams<CategoryParamsType>()
     const categories = useAppSelector(state => state.categories.items)
     const selectedCategory = useAppSelector(state => state.categories.selected)
+    const withCompleted = useAppSelector(state => state.todos.withCompleted)
 
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
@@ -23,7 +24,7 @@ export const NavigateCategoryId = () => {
                 if (category) {
                     if (selectedCategory?.id !== category.id) {
                         dispatch(setSelectedCategory(category))
-                        dispatch(getTodosThunk(category.id))
+                        dispatch(getTodosThunk({ categoryId: category.id, withCompleted }))
                     }
 
                     prevCategoryIdRef.current = categoryId
@@ -39,7 +40,7 @@ export const NavigateCategoryId = () => {
                 prevCategoryIdRef.current = undefined
             }
         }
-    }, [categoryId, selectedCategory, categories, dispatch])
+    }, [categoryId, selectedCategory, categories, withCompleted, dispatch])
 
     return <Outlet />
 }
