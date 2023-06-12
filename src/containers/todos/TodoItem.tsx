@@ -4,6 +4,9 @@ import { deleteTodoThunk, toggleTodoCollapsed, toggleTodoProgress } from '../../
 import { useAppDispatch } from '../../slices/store'
 import { appDateFormat } from '../../dateFormat'
 import { DragHandleProps } from '../sortableTree/types'
+import { CheckBox } from './CheckBox'
+
+
 
 export const TodoItem: FC<{
     item: Todo
@@ -51,6 +54,9 @@ export const TodoItem: FC<{
                     {item.isOpen ? '🡫' : '>'}
                 </div>
             )}
+            {/* <CheckboxLight /> */}
+            <CheckBox />
+            
             <input
                 type='checkbox'
                 checked={item.isDone}
@@ -105,5 +111,47 @@ export const TodoItem: FC<{
                 </>
             }
         </div>
+    )
+}
+
+const CheckboxLight = () => {
+    return (
+        <>
+            {/* <span className='MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-root MuiCheckbox-colorPrimary css-12wnr2w-MuiButtonBase-root-MuiCheckbox-root'>
+                <input
+                    className='PrivateSwitchBase-input css-1m9pwf3'
+                    type='checkbox'
+                    data-indeterminate='false'
+                />
+                <svg
+                    className='MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root'
+                    focusable='false'
+                    aria-hidden='true'
+                    viewBox='0 0 24 24'
+                    data-testid='CheckBoxOutlineBlankIcon'
+                >
+                    <path d='M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z'></path>
+                </svg>
+                <span className='MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root'></span>
+            </span>
+
+            <span className='MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary Mui-checked MuiCheckbox-root MuiCheckbox-colorPrimary css-12wnr2w-MuiButtonBase-root-MuiCheckbox-root'>
+                <input
+                    className='PrivateSwitchBase-input css-1m9pwf3'
+                    type='checkbox'
+                    data-indeterminate='false'
+                />
+                <svg
+                    className='MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root'
+                    focusable='false'
+                    aria-hidden='true'
+                    viewBox='0 0 24 24'
+                    data-testid='CheckBoxIcon'
+                >
+                    <path d='M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z'></path>
+                </svg>
+                <span className='MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root'></span>
+            </span> */}
+        </>
     )
 }

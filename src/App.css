@@ -5,7 +5,8 @@
 
 .header {
     height: 60px;
-    background-color: orange;
+    background-color: #001529;
+    color: white;
     display: flex;
     justify-content: space-between;
 }

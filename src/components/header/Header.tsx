@@ -1,11 +1,11 @@
 import { useNavigate } from 'react-router-dom'
-import { logoutThunk } from '../slices/accountSlice'
-import { useAppDispatch, useAppSelector } from '../slices/store'
-import { toggleSider } from '../slices/appSlice'
-import { setSelectedCategory } from '../slices/categoriesSlice'
+import { logoutThunk } from '../../slices/accountSlice'
+import { useAppDispatch, useAppSelector } from '../../slices/store'
+import { toggleSider } from '../../slices/appSlice'
+import { setSelectedCategory } from '../../slices/categoriesSlice'
 import { Link } from 'react-router-dom'
 import { memo, useEffect } from 'react'
-import { useLoadDelay } from '../hooks/useLoadDelay'
+import { useLoadDelay } from '../../hooks/useLoadDelay'
 
 export const Header = memo(() => {
     const { isAuth, username } = useAppSelector(state => state.account)

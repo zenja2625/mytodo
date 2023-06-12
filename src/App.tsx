@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { Outlet, useParams } from 'react-router-dom'
 import './App.css'
-import { Header } from './containers/Header'
+import { Header } from './components/header/Header'
 import { LoadPage } from './containers/LoadPage'
 import { ModalProvider } from './containers/modal/ModalProvider'
 import { CategoryParamsType } from './containers/types'
