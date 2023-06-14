@@ -1,9 +1,13 @@
-import { memo, useMemo } from 'react'
+import { memo, useMemo, useRef } from 'react'
 import { ListChildComponentProps, areEqual } from 'react-window'
 import { TreeItem, RowProps } from './types'
 
+import { CSSTransition, TransitionGroup } from 'react-transition-group'
+
 export const Row = memo(
     <T extends TreeItem>({ index, style, data }: ListChildComponentProps<RowProps<T>>) => {
+        const ref = useRef<HTMLDivElement>(null)
+
         const { activeIndex, order, getHandleProps, getItem, getRowStyle } = data
 
         const id = order[index].id
@@ -12,7 +16,11 @@ export const Row = memo(
 
         if (activeIndex === index) return null
 
-        return <div style={getRowStyle(index, style)}>{rowElement}</div>
+        return (
+            <div ref={ref} style={getRowStyle(index, style)}>
+                {rowElement}
+            </div>
+        )
     },
     areEqual
 )

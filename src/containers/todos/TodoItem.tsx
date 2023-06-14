@@ -7,7 +7,6 @@ import { DragHandleProps } from '../sortableTree/types'
 import { CheckBox } from './CheckBox'
 
 
-
 export const TodoItem: FC<{
     item: Todo
     categoryId: string
@@ -55,8 +54,14 @@ export const TodoItem: FC<{
                 </div>
             )}
             {/* <CheckboxLight /> */}
-            <CheckBox />
-            
+            <CheckBox
+                checked={item.isDone}
+                onChange={async () => {
+                    dispatch(toggleTodoProgress(item.id))
+                    // setTimeout(() => dispatch(toggleTodoProgress(item.id)), 200)
+                }}
+            />
+
             <input
                 type='checkbox'
                 checked={item.isDone}

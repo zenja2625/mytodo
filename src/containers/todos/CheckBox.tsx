@@ -1,18 +1,33 @@
+import { CSSProperties, FC, useMemo, useCallback, memo } from 'react'
 import './checkbox.css'
 
-export const CheckBox = () => {
+type CheckBoxProps = {
+    size?: number
+    checked?: boolean
+    onChange?: (checked: boolean) => void
+}
+
+export const CheckBox: FC<CheckBoxProps> = memo(({ size, checked, onChange }) => {
+    const style: CSSProperties = useMemo(
+        () => ({
+            fontSize: size,
+        }),
+        [size]
+    )
+
+    const onCheckChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            onChange?.(e.currentTarget.checked)
+        },
+        [onChange]
+    )
+
     return (
-        <label
-            style={{
-                width: '16px',
-                height: '16px',
-                fontSize: '16px',
-            }}
-            className='checkbox__container'
-        >
-            <input type='checkbox' />
-            <div className='background'></div>
-            <div className='checkmark'></div>
+        <label style={style} className='checkbox__container'>
+            <input onChange={onCheckChange} checked={checked} type='checkbox' />
+            <div className='checkbox'>
+                <div className='checkmark'></div>
+            </div>
         </label>
     )
-}
+})
