@@ -157,17 +157,16 @@ export const todosSlice = createSlice({
         clearTodoPositions: state => {
             state.todoPositionDTOs = []
         },
-        removeChecked: state => {
-            const todos = state.items
+        removeChecked: (state, action: PayloadAction<string>) => {
             const withCompleted = state.withCompleted
 
             if (!withCompleted) {
-                let i = 0
+                const todos = state.items
 
-                while (i < todos.length) {
-                    if (todos[i].isDone === true) todos.splice(i, 1)
-                    else ++i
-                }
+                const index = todos.findIndex(todo => todo.id === action.payload)
+
+                const childrenCount = getTodoChildrenCount(todos, index)
+                todos.splice(index, childrenCount + 1)
             }
         },
         toggleTodoProgress: (state, action: PayloadAction<string>) => {
@@ -284,4 +283,5 @@ export const {
     clearTodoStatuses,
     deleteTodo,
     toggleShowCompletedTodos,
+    removeChecked,
 } = todosSlice.actions

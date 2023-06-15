@@ -7,6 +7,7 @@ import { ModalProvider } from './containers/modal/ModalProvider'
 import { CategoryParamsType } from './containers/types'
 import { initializeApp } from './slices/appSlice'
 import { useAppDispatch, useAppSelector } from './slices/store'
+import moment from 'moment'
 
 export const App = () => {
     const { categoryId } = useParams<CategoryParamsType>()

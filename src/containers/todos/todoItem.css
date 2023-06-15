@@ -1,0 +1,121 @@
+.todo__wrapper {
+    height: 100%;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 0 0 5px;
+    user-select: none;
+}
+
+.todo__group {
+    display: flex;
+}
+
+.todo__content {
+    flex-grow: 1;
+    overflow: hidden;
+
+    margin-top: -0.2em;
+}
+
+.todo__value,
+.todo__date {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.todo__value {
+    font-size: 1.1em;
+}
+
+.todo__date {
+    margin-top: -0.4em;
+    font-size: 0.8em;
+}
+
+.item {
+    width: 16px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.empty {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.arrow {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.arrow::before {
+    content: '';
+    position: absolute;
+
+    width: 50%;
+    height: 50%;
+
+    transform-origin: 75% 25%;
+
+    margin-top: 37.5%;
+    margin-left: 12.5%;
+
+    box-sizing: border-box;
+    border-top: 0.15em solid black;
+    border-right: 0.15em solid black;
+
+    transition: transform 0.2s;
+    transform: rotate(45deg) translateY(-0.05em) translateX(0.05em);
+}
+
+.down.arrow::before {
+    transform: rotate(135deg) translateY(-0.05em) translateX(0.05em);
+}
+
+.move {
+    width: 16px;
+    height: 100%;
+
+    cursor: move;
+
+    position: absolute;
+    left: -16px;
+}
+
+.menu__button {
+    position: relative;
+
+    flex-shrink: 0;
+    width: 32px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+
+    transition: background-color 0.2s;
+}
+.menu__button:hover {
+    background-color: hsl(0, 0%, 65%);
+}
+
+.menu__button:active {
+    background-color: hsl(0, 0%, 55%);
+}
+
+.menu__open {
+    width: 50px;
+    height: 100px;
+    background-color: red;
+    position: absolute;
+    bottom: -100px;
+z-index: 1000;
+}

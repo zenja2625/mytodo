@@ -5,6 +5,8 @@ import { accountAPI } from './accountApi'
 import { categoriesAPI } from './categoriesApi'
 import { todosAPI } from './todosApi'
 
+import 'moment/locale/ru'
+
 export const baseURL = 'https://mytodo.azurewebsites.net/api/'
 // export const baseURL = 'https://localhost:44352/api/'
 
