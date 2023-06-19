@@ -2,7 +2,6 @@ import { memo, useMemo, useRef } from 'react'
 import { ListChildComponentProps, areEqual } from 'react-window'
 import { TreeItem, RowProps } from './types'
 
-import { CSSTransition, TransitionGroup } from 'react-transition-group'
 
 export const Row = memo(
     <T extends TreeItem>({ index, style, data }: ListChildComponentProps<RowProps<T>>) => {

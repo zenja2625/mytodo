@@ -110,12 +110,3 @@
 .menu__button:active {
     background-color: hsl(0, 0%, 55%);
 }
-
-.menu__open {
-    width: 50px;
-    height: 100px;
-    background-color: red;
-    position: absolute;
-    bottom: -100px;
-z-index: 1000;
-}

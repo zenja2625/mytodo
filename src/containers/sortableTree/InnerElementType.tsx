@@ -2,8 +2,6 @@ import { forwardRef, CSSProperties, useContext, createContext } from 'react'
 import { ReactElementType } from 'react-window'
 import { InnerElementContext } from './types'
 
-import { CSSTransition, TransitionGroup } from 'react-transition-group'
-
 export const innerElementInitialValue: InnerElementContext = {
     isDrag: false,
     itemHeight: 0,

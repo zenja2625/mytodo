@@ -1,27 +1,34 @@
 import { FC, useEffect, useState } from 'react'
+import { appDateFormat } from '../../dateFormat'
 import { PutTodoDTO, Todo } from '../../slices/sliceTypes'
+import { useAppDispatch } from '../../slices/store'
 import {
     deleteTodoThunk,
     removeChecked,
     toggleTodoCollapsed,
     toggleTodoProgress,
 } from '../../slices/todosSlice'
-import { useAppDispatch } from '../../slices/store'
-import { appDateFormat } from '../../dateFormat'
 import { DragHandleProps } from '../sortableTree/types'
 import { CheckBox } from './CheckBox'
-
 import './todoItem.css'
-//#f5f5f5
-export const TodoItem: FC<{
+import { MenuKeys, TodoMenu } from './TodoMenu'
+
+type TodoItemProps = {
     item: Todo
     categoryId: string
     handleProps?: DragHandleProps
     openEditModal: (id: string, defaultValues?: PutTodoDTO) => void
     openAddModal: (overId?: string, addBefore?: boolean) => void
-}> = ({ item, categoryId, handleProps, openEditModal, openAddModal }) => {
-    const [menuOpen, setMenuOpen] = useState(false)
+}
 
+//#f5f5f5
+export const TodoItem: FC<TodoItemProps> = ({
+    item,
+    categoryId,
+    handleProps,
+    openEditModal,
+    openAddModal,
+}) => {
     const dispatch = useAppDispatch()
 
     const { id, value, taskEnd, isDone, showHideButton, isOpen } = item
@@ -35,6 +42,24 @@ export const TodoItem: FC<{
             }
         }
     }, [isDone, id, dispatch])
+
+    const switchEvent = (key: MenuKeys) => {
+        switch (key) {
+            case 'change':
+                openEditModal(id, { value, taskEnd })
+                break
+            case 'up':
+                openAddModal(id, true)
+                break
+            case 'down':
+                openAddModal(id)
+                break
+            case 'remove':
+                const response = window.confirm('Remove this item')
+                if (response) dispatch(deleteTodoThunk({ categoryId, id: id }))
+                break
+        }
+    }
 
     return (
         <div className='todo__wrapper'>
@@ -65,48 +90,7 @@ export const TodoItem: FC<{
                 {taskEnd && <div className='todo__date'>{taskEnd.format(appDateFormat)}</div>}
             </div>
 
-            <div onClick={() => setMenuOpen(prev => !prev)} className='menu__button'>
-                <svg style={{ height: '16px' }} viewBox='0 0 100 50'>
-                    <circle cx='30' cy='25' r='5' fill='black' />
-                    <circle cx='50' cy='25' r='5' fill='black' />
-                    <circle cx='70' cy='25' r='5' fill='black' />
-                </svg>
-
-                {menuOpen && (
-                    <div className='menu__open'>
-                        <button
-                            onClick={() => {
-                                openAddModal(id, true)
-                            }}
-                        >
-                            Add Up
-                        </button>
-                        <button
-                            onClick={() => {
-                                openAddModal(id)
-                            }}
-                        >
-                            Add Bottom
-                        </button>
-                        <button
-                            onClick={() => {
-                                openEditModal(id, { value, taskEnd })
-                            }}
-                        >
-                            Edit
-                        </button>
-                        <button
-                            onClick={() => {
-                                const response = window.confirm('Remove this item')
-
-                                if (response) dispatch(deleteTodoThunk({ categoryId, id: id }))
-                            }}
-                        >
-                            Delete
-                        </button>
-                    </div>
-                )}
-            </div>
+            <TodoMenu switchEvent={switchEvent} />
         </div>
     )
 }
