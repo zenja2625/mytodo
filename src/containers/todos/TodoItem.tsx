@@ -1,4 +1,5 @@
-import { FC, useEffect, useState } from 'react'
+import { FC, useEffect, useState, memo } from 'react'
+import { areEqual } from 'react-window'
 import { appDateFormat } from '../../dateFormat'
 import { PutTodoDTO, Todo } from '../../slices/sliceTypes'
 import { useAppDispatch } from '../../slices/store'
@@ -22,7 +23,7 @@ type TodoItemProps = {
 }
 
 //#f5f5f5
-export const TodoItem: FC<TodoItemProps> = ({
+export const TodoItem: FC<TodoItemProps> = memo(({
     item,
     categoryId,
     handleProps,
@@ -30,6 +31,10 @@ export const TodoItem: FC<TodoItemProps> = ({
     openAddModal,
 }) => {
     const dispatch = useAppDispatch()
+
+    useEffect(() => {
+        console.log('item')
+    })
 
     const { id, value, taskEnd, isDone, showHideButton, isOpen } = item
 
@@ -93,4 +98,13 @@ export const TodoItem: FC<TodoItemProps> = ({
             <TodoMenu switchEvent={switchEvent} />
         </div>
     )
-}
+}, (prev, next) => {
+    const { item: itemPrev,...prevProps } = prev
+    const { item: itemNext,...nextProps } = next
+
+    const isEqual = 
+        areEqual(prevProps, nextProps) &&
+        areEqual(prev.item, next.item)
+
+    return isEqual
+})
