@@ -5,7 +5,7 @@ import { PutTodoDTO, Todo } from '../../slices/sliceTypes'
 import { useAppDispatch } from '../../slices/store'
 import {
     deleteTodoThunk,
-    removeChecked,
+    removeTodo,
     toggleTodoCollapsed,
     toggleTodoProgress,
 } from '../../slices/todosSlice'
@@ -27,36 +27,23 @@ export const TodoItem: FC<TodoItemProps> = memo(
     ({ item, categoryId, handleProps, openEditModal, openAddModal }) => {
         const { id, value, taskEnd, isDone, showHideButton, isOpen } = item
 
-        const [prevIsDone, setPrevIsDone] = useState(isDone)
+        useEffect(() => {
+           console.log('useEffect');
+           
+        })
+
         const dispatch = useAppDispatch()
 
         useEffect(() => {
-            console.log('UseEffect')
-        })
-
-        useEffect(() => {
-            const timeoutId =
-                isDone !== prevIsDone &&
-                setTimeout(() => {
-                    setPrevIsDone(isDone)
-                    if (isDone) dispatch(removeChecked(id))
-                }, 3000)
+            const timeoutId = isDone && setTimeout(() => dispatch(removeTodo(id)), 300)
 
             return () => {
                 if (timeoutId) {
                     clearTimeout(timeoutId)
-                    setPrevIsDone(isDone)
-
-                    // console.log(`${id} ${isDone}`)
                 }
             }
-        }, [isDone, prevIsDone, id])
+        }, [isDone, id, dispatch])
 
-        const onCheck = () => {
-            if (isDone === prevIsDone) {
-                dispatch(toggleTodoProgress(id))
-            }
-        }
 
         const switchEvent = (key: MenuKeys) => {
             switch (key) {
@@ -92,7 +79,7 @@ export const TodoItem: FC<TodoItemProps> = memo(
                 )}
 
                 <div className='item'>
-                    <CheckBox size={16} checked={isDone} onChange={onCheck} />
+                    <CheckBox size={16} checked={isDone} onChange={() => dispatch(toggleTodoProgress(id))} />
                 </div>
                 <div className='todo__content'>
                     <div className='todo__value'>{value}</div>
@@ -107,7 +94,14 @@ export const TodoItem: FC<TodoItemProps> = memo(
         const { item: itemPrev, ...prevProps } = prev
         const { item: itemNext, ...nextProps } = next
 
-        const isEqual = areEqual(prevProps, nextProps) && areEqual(prev.item, next.item)
+        const { taskEnd: taskEndPrev, ...itemPrevProps } = itemPrev
+        const { taskEnd: taskEndNext, ...itemNextProps } = itemNext
+
+        const taskEndExist = taskEndPrev && taskEndNext
+        const taskEndEqual = taskEndExist ? taskEndPrev.isSame(taskEndNext) : taskEndPrev === taskEndNext
+
+        const isEqual = areEqual(prevProps, nextProps) && areEqual(itemPrevProps, itemNextProps)
+            && taskEndEqual
 
         return isEqual
     }

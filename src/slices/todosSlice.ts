@@ -248,6 +248,12 @@ export const todosSlice = createSlice({
             const count = getTodoChildrenCount(state.items, todoIndex)
             state.items.splice(todoIndex, 1 + count)
         },
+        removeTodo: (state, action: PayloadAction<string>) => {
+            if (!state.withCompleted) {
+                const todoIndex = state.items.findIndex(todo => todo.id === action.payload)
+                state.items.splice(todoIndex, 1)
+            }
+        },
     },
     extraReducers: builder => {
         builder
@@ -284,4 +290,5 @@ export const {
     deleteTodo,
     toggleShowCompletedTodos,
     removeChecked,
+    removeTodo
 } = todosSlice.actions
