@@ -89,10 +89,8 @@ export const SortableTree = <T extends TreeItem>({
         }),
         [dragStart]
     )
-    const getItem = useCallback(
-        (index: number, handleProps: DragHandleProps) => renderItem(order[index], handleProps),
-        [order, renderItem]
-    )
+    const getItem = (index: number, handleProps: DragHandleProps) =>
+        renderItem(order[index], handleProps)
 
     const rowData: RowProps<T> = useMemo(
         () => ({ activeIndex, order, getItem, getRowStyle, getHandleProps }),

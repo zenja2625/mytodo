@@ -23,10 +23,10 @@ export const CheckBox: FC<CheckBoxProps> = memo(({ size, checked, onChange }) =>
     )
 
     return (
-        <label style={style} className='checkbox__container'>
+        <label style={style} className='todo-checkbox-wrapper'>
             <input onChange={onCheckChange} checked={checked} type='checkbox' />
-            <div className='checkbox'>
-                <div className='checkmark'></div>
+            <div className='todo-checkbox'>
+                <div className='todo-checkmark'></div>
             </div>
         </label>
     )

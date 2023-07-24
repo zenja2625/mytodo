@@ -26,18 +26,19 @@ export const TodoMenu: FC<TodoMenuProps> = ({ switchEvent }) => {
     return (
         <>
             <div onClick={handleClick} className='menu__button'>
-                <svg style={{ height: '16px' }} viewBox='0 0 100 50'>
-                    <circle cx='30' cy='25' r='5' fill='black' />
-                    <circle cx='50' cy='25' r='5' fill='black' />
-                    <circle cx='70' cy='25' r='5' fill='black' />
+                <svg viewBox='0 0 100 50'>
+                    <path d='M24,25 A5,5 0 1,0 34,25 A5,5 0 1,0 24,25 Z M44,25 A5,5 0 1,0 54,25 A5,5 0 1,0 44,25 Z M64,25 A5,5 0 1,0 74,25 A5,5 0 1,0 64,25Z' />
                 </svg>
             </div>
 
             {isOpen && (
-                <Menu disableAutoFocusItem={true} anchorEl={anchorEl} open={isOpen} onClose={handleClose}>
-                    <MenuItem  onClick={() => onClick('change')}>
-                        Изменить
-                    </MenuItem>
+                <Menu
+                    disableAutoFocusItem={true}
+                    anchorEl={anchorEl}
+                    open={isOpen}
+                    onClose={handleClose}
+                >
+                    <MenuItem onClick={() => onClick('change')}>Изменить</MenuItem>
                     <MenuItem onClick={() => onClick('up')}>Добавить выше</MenuItem>
                     <MenuItem onClick={() => onClick('down')}>Добавить ниже</MenuItem>
                     <MenuItem onClick={() => onClick('remove')}>Удалить</MenuItem>
