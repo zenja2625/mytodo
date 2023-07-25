@@ -19,26 +19,41 @@ export const InnerElementType: ReactElementType = forwardRef<
     rest = { ...rest, style: { ...rest.style, position: 'relative' } }
 
     return (
-        <div
-            style={{
-                display: 'flex',
-                justifyContent: 'center',
-            }}
-        >
+        <>
+            {header && (
+                <div
+                    style={{
+                        backgroundColor: 'white',
+                        position: 'sticky',
+                        top: 0,
+                        zIndex: 1,
+                    }}
+                >
+                    <div
+                        style={{
+                            maxWidth: '800px',
+                            margin: '0 auto',
+                            padding: '0 45px 0 45px',
+                        }}
+                    >
+                        {header}
+                    </div>
+                </div>
+            )}
+
             <div
                 style={{
-                    width: '800px',
                     maxWidth: '800px',
-                    margin: '0 45px 0 45px',
+                    margin: '0 auto',
+                    padding: '0 45px 0 45px',
                 }}
             >
-                {header}
                 <div ref={ref} {...rest}>
                     {isDrag && (
                         <div
                             style={{
                                 position: 'absolute',
-                                backgroundColor: 'gray',
+                                backgroundColor: 'lightgray',
                                 height: `${itemHeight}px`,
                                 top: `${yOffset}px`,
                                 right: 0,
@@ -48,8 +63,13 @@ export const InnerElementType: ReactElementType = forwardRef<
                     )}
                     {children}
                 </div>
-                {footer}
+                {footer && (
+                    <>
+                        {footer}
+                        <div style={{ height: '100px' }}></div>
+                    </>
+                )}
             </div>
-        </div>
+        </>
     )
 })

@@ -109,7 +109,6 @@ export const SortableTree = <T extends TreeItem>({
     return (
         <div
             style={{
-                backgroundColor: 'green',
                 height: '100%',
             }}
         >
