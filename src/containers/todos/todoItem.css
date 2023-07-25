@@ -6,6 +6,9 @@
     gap: 10px;
     padding: 0 0 0 5px;
     user-select: none;
+}
+
+.todo__wrapper.border-bottom {
     border-bottom: 10px solid #f0f0f0;
 }
 

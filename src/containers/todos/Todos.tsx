@@ -21,7 +21,8 @@ import { TodoPositionDTO, TodoStatusDTO } from '../../api/apiTypes'
 import { useModal } from '../modal/useModal'
 import { todoFields } from '../../forms'
 import { areEqual } from 'react-window'
-import { Button, Stack, ToggleButton, Typography } from '@mui/material'
+import { Box, Button, Paper, Stack, ToggleButton, Typography } from '@mui/material'
+import { TodoItemContent } from './TodoItemContent'
 
 export const Todos = memo(({ selectedCategory }: { selectedCategory: Category }) => {
     const withCompleted = useAppSelector(state => state.todos.withCompleted)
@@ -153,7 +154,11 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
                     openAddModal={openCreateModal}
                 />
             )}
-            renderOverlay={item => <TodoItem1 item={item} />}
+            renderOverlay={item => (
+                <Box height={44} boxShadow={3}>
+                    <TodoItemContent item={item} />
+                </Box>
+            )}
             onDrop={onDrop}
             header={header}
             footer={footer}

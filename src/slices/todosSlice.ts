@@ -222,6 +222,9 @@ export const todosSlice = createSlice({
 
             const activeIndex = todos.findIndex(todo => todo.id === id)
             const depthDelta = depth - todos[activeIndex].depth
+
+            if (id === overId && depthDelta === 0) return
+
             const childrenCount = getTodoChildrenCount(todos, activeIndex)
             const movedElements = todos.splice(activeIndex, childrenCount + 1)
 
@@ -290,5 +293,5 @@ export const {
     deleteTodo,
     toggleShowCompletedTodos,
     removeChecked,
-    removeTodo
+    removeTodo,
 } = todosSlice.actions

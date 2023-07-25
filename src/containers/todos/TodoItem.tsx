@@ -13,6 +13,7 @@ import { DragHandleProps } from '../sortableTree/types'
 import { CheckBox } from './CheckBox'
 import './todoItem.css'
 import { MenuKeys, TodoMenu } from './TodoMenu'
+import { TodoItemContent } from './TodoItemContent'
 
 type TodoItemProps = {
     item: Todo
@@ -62,34 +63,13 @@ export const TodoItem: FC<TodoItemProps> = memo(
         }
 
         return (
-            <div className='todo__wrapper'>
-                <svg {...handleProps} className='move' viewBox='0 0 50 100'>
-                    <path d='M20,30 A5,5 0 0 1 30,30 A5,5 0 0 1 20,30 Z M20,50 A5,5 0 0 1 30,50 A5,5 0 0 1 20,50 Z M20,70 A5,5 0 0 1 30,70 A5,5 0 0 1 20,70 Z' />
-                </svg>
-
-                {showHideButton ? (
-                    <div
-                        onClick={() => dispatch(toggleTodoCollapsed(id))}
-                        className={`arrow ${isOpen ? 'down' : ''}`}
-                    ></div>
-                ) : (
-                    <div className='empty'></div>
-                )}
-
-                <div className='item'>
-                    <CheckBox
-                        size={16}
-                        checked={isDone}
-                        onChange={() => dispatch(toggleTodoProgress(id))}
-                    />
-                </div>
-                <div className='todo__content'>
-                    <div className='todo__value'>{value}</div>
-                    {taskEnd && <div className='todo__date'>{taskEnd.format(appDateFormat)}</div>}
-                </div>
-
-                <TodoMenu switchEvent={switchEvent} />
-            </div>
+            <TodoItemContent
+                item={item}
+                handleProps={handleProps}
+                switchEvent={switchEvent}
+                toggleColapsed={() => dispatch(toggleTodoCollapsed(id))}
+                toggleProgress={() => dispatch(toggleTodoProgress(id))}
+            />
         )
     },
     (prev, next) => {
