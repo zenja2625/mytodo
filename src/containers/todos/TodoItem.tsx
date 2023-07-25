@@ -1,4 +1,4 @@
-import { FC, useEffect, memo, useState } from 'react'
+import { FC, useEffect, memo } from 'react'
 import { areEqual } from 'react-window'
 import { appDateFormat } from '../../dateFormat'
 import { PutTodoDTO, Todo } from '../../slices/sliceTypes'
@@ -28,8 +28,7 @@ export const TodoItem: FC<TodoItemProps> = memo(
         const { id, value, taskEnd, isDone, showHideButton, isOpen } = item
 
         useEffect(() => {
-           console.log('useEffect');
-           
+            console.log('Todo Item Render')
         })
 
         const dispatch = useAppDispatch()
@@ -43,7 +42,6 @@ export const TodoItem: FC<TodoItemProps> = memo(
                 }
             }
         }, [isDone, id, dispatch])
-
 
         const switchEvent = (key: MenuKeys) => {
             switch (key) {
@@ -79,7 +77,11 @@ export const TodoItem: FC<TodoItemProps> = memo(
                 )}
 
                 <div className='item'>
-                    <CheckBox size={16} checked={isDone} onChange={() => dispatch(toggleTodoProgress(id))} />
+                    <CheckBox
+                        size={16}
+                        checked={isDone}
+                        onChange={() => dispatch(toggleTodoProgress(id))}
+                    />
                 </div>
                 <div className='todo__content'>
                     <div className='todo__value'>{value}</div>
@@ -91,17 +93,22 @@ export const TodoItem: FC<TodoItemProps> = memo(
         )
     },
     (prev, next) => {
-        const { item: itemPrev, ...prevProps } = prev
-        const { item: itemNext, ...nextProps } = next
-
-        const { taskEnd: taskEndPrev, ...itemPrevProps } = itemPrev
-        const { taskEnd: taskEndNext, ...itemNextProps } = itemNext
+        const {
+            item: { taskEnd: taskEndPrev, ...itemPrev },
+            ...prevProps
+        } = prev
+        const {
+            item: { taskEnd: taskEndNext, ...itemNext },
+            ...nextProps
+        } = next
 
         const taskEndExist = taskEndPrev && taskEndNext
-        const taskEndEqual = taskEndExist ? taskEndPrev.isSame(taskEndNext) : taskEndPrev === taskEndNext
+        const taskEndEqual = taskEndExist
+            ? taskEndPrev.isSame(taskEndNext)
+            : taskEndPrev === taskEndNext
 
-        const isEqual = areEqual(prevProps, nextProps) && areEqual(itemPrevProps, itemNextProps)
-            && taskEndEqual
+        const isEqual =
+            areEqual(prevProps, nextProps) && areEqual(itemPrev, itemNext) && taskEndEqual
 
         return isEqual
     }
