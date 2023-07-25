@@ -21,6 +21,7 @@ import { TodoPositionDTO, TodoStatusDTO } from '../../api/apiTypes'
 import { useModal } from '../modal/useModal'
 import { todoFields } from '../../forms'
 import { areEqual } from 'react-window'
+import { Button, Stack, ToggleButton, Typography } from '@mui/material'
 
 export const Todos = memo(({ selectedCategory }: { selectedCategory: Category }) => {
     const withCompleted = useAppSelector(state => state.todos.withCompleted)
@@ -103,20 +104,17 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
         [dispatch]
     )
 
-    // useEffect(() => {
-    //     console.log('openModal')
-    // }, [openModal])
     const header = useMemo(() => {
         return (
-            <div
-                style={{
-                    backgroundColor: 'skyblue',
-                    width: '100%',
-                    height: '60px',
-                }}
-            >
-                {selectedCategory.name}
-                <button
+            <Stack direction='row' justifyContent='space-between' alignItems='center' height={80}>
+                <Typography variant='h5' fontWeight='bold'>
+                    {selectedCategory.name}
+                </Typography>
+                <ToggleButton
+                    value='toggle'
+                    size='small'
+                    color='primary'
+                    selected={withCompleted}
                     onClick={() =>
                         dispatch(
                             getTodosThunk({
@@ -126,30 +124,22 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
                         )
                     }
                 >
-                    {withCompleted ? 'Скрыть' : 'Показать'}
-                </button>
-            </div>
+                    {withCompleted ? 'Скрыть выполненные' : 'Показать выполненные'}
+                </ToggleButton>
+            </Stack>
         )
     }, [selectedCategory, withCompleted, dispatch])
 
     const footer = useMemo(
         () => (
-            <div
-                style={{
-                    width: '100%',
-                    backgroundColor: 'skyblue',
-                }}
-            >
-                <button onClick={() => openCreateModal(todos[todos.length - 1]?.id)}>New</button>
-            </div>
+            <Button size='large' onClick={() => openCreateModal(todos[todos.length - 1]?.id)}>
+                Добавить задачу
+            </Button>
         ),
         [todos, openCreateModal]
     )
 
-    // if (showLoadPage) return <LoadPage />
-
     return (
-        // <div className='todos'>
         <SortableTree
             items={todos}
             itemHeight={44}
@@ -168,6 +158,5 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
             header={header}
             footer={footer}
         />
-        // </div>
     )
 }, areEqual)
