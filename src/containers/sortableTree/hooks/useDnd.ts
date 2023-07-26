@@ -41,8 +41,30 @@ export const useDnd = <T extends TreeItem>(
             : { x: 0, y: 0 }
     }, [initialPosition, activeIndex, order, depthWidth, wrapper, height, gap])
 
+    const autoScroll = ({ x, y }: Coors) => {
+        //todo Ref direction 1 -1 0
+        const parent = wrapper?.offsetParent
+
+        if (!parent) return
+        if (parent.scrollHeight === parent.clientHeight) return
+
+        const scrollTop = parent.scrollTop
+
+        const top = wrapper.getBoundingClientRect().y + scrollTop
+        const bottom = parent.getBoundingClientRect().bottom
+
+        if (top + 20 > y - shift.y) {
+            parent.scrollBy(0, -1)
+        } else if (bottom - 20 < y - shift.y + height) {
+            parent.scrollBy(0, 1)
+        }
+
+        // console.log(`${wrapper?.offsetParent?.scrollHeight} ${wrapper?.offsetParent?.clientHeight}`);
+    }
+
     const onMove = useCallback(
         ({ x, y }: Coors) => {
+            autoScroll({ x, y })
             const { x: dx = 0, y: dy = 0 } = wrapper?.getBoundingClientRect() || {}
 
             const offsetY = y - dy - shift.y
@@ -65,7 +87,19 @@ export const useDnd = <T extends TreeItem>(
             setOverIndex(index)
             setDepth(newDepth)
         },
-        [wrapper, height, gap, maxDepth, order, depthWidth, shift, depth, activeIndex, overIndex]
+        [
+            wrapper,
+            height,
+            gap,
+            maxDepth,
+            order,
+            depthWidth,
+            shift,
+            depth,
+            activeIndex,
+            overIndex,
+            autoScroll,
+        ]
     )
 
     const dragEnd = useCallback(() => {

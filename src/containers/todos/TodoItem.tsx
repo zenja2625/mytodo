@@ -29,7 +29,7 @@ export const TodoItem: FC<TodoItemProps> = memo(
         const { id, value, taskEnd, isDone, showHideButton, isOpen } = item
 
         useEffect(() => {
-            console.log('Todo Item Render')
+            // console.log('Todo Item Render')
         })
 
         const dispatch = useAppDispatch()
