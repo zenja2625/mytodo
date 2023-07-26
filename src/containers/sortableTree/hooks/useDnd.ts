@@ -4,6 +4,7 @@ import { getLimitValue } from '../utils/getLimitValue'
 import { skipDragItems } from '../utils/skipDragItems'
 import { Coors, TreeItem } from '../types'
 import { useListeners } from './useListeners'
+import { useAutoScroll } from './useAutoScroll'
 
 export const useDnd = <T extends TreeItem>(
     height: number,
@@ -25,10 +26,7 @@ export const useDnd = <T extends TreeItem>(
         itemsRef.current = items
     }, [items])
 
-    const order = useMemo(
-        () => (activeIndex !== -1 ? skipDragItems(items, activeIndex) : items),
-        [items, activeIndex]
-    )
+    const order = useMemo(() => (activeIndex !== -1 ? skipDragItems(items, activeIndex) : items), [items, activeIndex])
 
     const shift = useMemo((): Coors => {
         const { x = 0, y = 0 } = wrapper?.getBoundingClientRect() || {}
@@ -41,30 +39,11 @@ export const useDnd = <T extends TreeItem>(
             : { x: 0, y: 0 }
     }, [initialPosition, activeIndex, order, depthWidth, wrapper, height, gap])
 
-    const autoScroll = ({ x, y }: Coors) => {
-        //todo Ref direction 1 -1 0
-        const parent = wrapper?.offsetParent
-
-        if (!parent) return
-        if (parent.scrollHeight === parent.clientHeight) return
-
-        const scrollTop = parent.scrollTop
-
-        const top = wrapper.getBoundingClientRect().y + scrollTop
-        const bottom = parent.getBoundingClientRect().bottom
-
-        if (top + 20 > y - shift.y) {
-            parent.scrollBy(0, -1)
-        } else if (bottom - 20 < y - shift.y + height) {
-            parent.scrollBy(0, 1)
-        }
-
-        // console.log(`${wrapper?.offsetParent?.scrollHeight} ${wrapper?.offsetParent?.clientHeight}`);
-    }
+    const autoScroll = useAutoScroll(activeIndex !== -1, wrapper, 40, 15)
 
     const onMove = useCallback(
         ({ x, y }: Coors) => {
-            autoScroll({ x, y })
+            autoScroll(y - shift.y, height)
             const { x: dx = 0, y: dy = 0 } = wrapper?.getBoundingClientRect() || {}
 
             const offsetY = y - dy - shift.y
@@ -87,19 +66,7 @@ export const useDnd = <T extends TreeItem>(
             setOverIndex(index)
             setDepth(newDepth)
         },
-        [
-            wrapper,
-            height,
-            gap,
-            maxDepth,
-            order,
-            depthWidth,
-            shift,
-            depth,
-            activeIndex,
-            overIndex,
-            autoScroll,
-        ]
+        [wrapper, height, gap, maxDepth, order, depthWidth, shift, depth, activeIndex, overIndex, autoScroll]
     )
 
     const dragEnd = useCallback(() => {
@@ -114,7 +81,7 @@ export const useDnd = <T extends TreeItem>(
 
     const dragStart = useCallback(
         (id: string) => (e: React.MouseEvent | React.TouchEvent) => {
-            const index = itemsRef.current.findIndex(item => item.id === id)
+            const index = itemsRef.current.findIndex((item) => item.id === id)
 
             if (index !== -1) {
                 const initialPosition = getCoordinates(e.nativeEvent)
