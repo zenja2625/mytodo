@@ -11,11 +11,11 @@ export const Overlay: FC<OverlayProps> = memo(
         const style: CSSProperties = useMemo(
             () => ({
                 position: 'fixed',
-                backgroundColor: 'burlywood',
                 width: `${width}px`,
                 height: `${height}px`,
                 top: coors.y - shift.y,
                 left: coors.x - shift.x,
+                zIndex: 1000
             }),
             [coors, shift]
         )

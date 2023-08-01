@@ -21,8 +21,11 @@ import { TodoPositionDTO, TodoStatusDTO } from '../../api/apiTypes'
 import { useModal } from '../modal/useModal'
 import { todoFields } from '../../forms'
 import { areEqual } from 'react-window'
-import { Box, Button, Paper, Stack, ToggleButton, Typography } from '@mui/material'
+import { Box, Button, IconButton, Paper, Stack, ToggleButton, Typography } from '@mui/material'
 import { TodoItemContent } from './TodoItemContent'
+
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 
 export const Todos = memo(({ selectedCategory }: { selectedCategory: Category }) => {
     const withCompleted = useAppSelector((state) => state.todos.withCompleted)
@@ -111,11 +114,7 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
                 <Typography variant="h5" fontWeight="bold">
                     {selectedCategory.name}
                 </Typography>
-                <ToggleButton
-                    value="toggle"
-                    size="small"
-                    color="primary"
-                    selected={withCompleted}
+                <IconButton
                     onClick={() =>
                         dispatch(
                             getTodosThunk({
@@ -124,9 +123,10 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
                             })
                         )
                     }
+                    color={withCompleted ? 'inherit' : 'default'}
                 >
-                    {withCompleted ? 'Скрыть выполненные' : 'Показать выполненные'}
-                </ToggleButton>
+                    {withCompleted ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                </IconButton>
             </Stack>
         )
     }, [selectedCategory, withCompleted, dispatch])
