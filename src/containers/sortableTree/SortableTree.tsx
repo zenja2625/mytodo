@@ -3,13 +3,7 @@ import AutoSizer from 'react-virtualized-auto-sizer'
 import { FixedSizeList as List } from 'react-window'
 import { InnerElementType, innerElementContext, innerElementInitialValue } from './InnerElementType'
 import { Row } from './Row'
-import {
-    DragHandleProps,
-    InnerElementContext,
-    RowProps,
-    SortableTreeProps,
-    TreeItem,
-} from './types'
+import { DragHandleProps, InnerElementContext, RowProps, SortableTreeProps, TreeItem } from './types'
 import { useDnd } from './hooks/useDnd'
 import { Overlay } from './Overlay'
 import { TodoItem1 } from '../todos/TodoItem1'
@@ -89,8 +83,7 @@ export const SortableTree = <T extends TreeItem>({
         }),
         [dragStart]
     )
-    const getItem = (index: number, handleProps: DragHandleProps) =>
-        renderItem(order[index], handleProps)
+    const getItem = (index: number, handleProps: DragHandleProps) => renderItem(order[index], handleProps)
 
     const rowData: RowProps<T> = useMemo(
         () => ({ activeIndex, order, getItem, getRowStyle, getHandleProps }),
@@ -101,8 +94,7 @@ export const SortableTree = <T extends TreeItem>({
 
     const overlayWidth = useMemo(() => {
         return innerRef.current && activeIndex !== -1
-            ? innerRef.current.getBoundingClientRect().width -
-                  order[activeIndex].depth * itemDepthWidth
+            ? innerRef.current.getBoundingClientRect().width - order[activeIndex].depth * itemDepthWidth
             : 0
     }, [itemDepthWidth, activeIndex, order])
 
@@ -126,6 +118,9 @@ export const SortableTree = <T extends TreeItem>({
                             innerElementType={InnerElementType}
                             innerRef={innerRef}
                             itemKey={setItemKey}
+                            style={{
+                                willChange: 'auto',
+                            }}
                         >
                             {Row}
                         </List>

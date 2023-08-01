@@ -25,11 +25,11 @@ import { Box, Button, Paper, Stack, ToggleButton, Typography } from '@mui/materi
 import { TodoItemContent } from './TodoItemContent'
 
 export const Todos = memo(({ selectedCategory }: { selectedCategory: Category }) => {
-    const withCompleted = useAppSelector(state => state.todos.withCompleted)
+    const withCompleted = useAppSelector((state) => state.todos.withCompleted)
     const todos = useAppSelector(getTodos)
 
-    const statuses = useAppSelector(state => state.todos.todoStatusDTOs)
-    const positions = useAppSelector(state => state.todos.todoPositionDTOs)
+    const statuses = useAppSelector((state) => state.todos.todoStatusDTOs)
+    const positions = useAppSelector((state) => state.todos.todoPositionDTOs)
 
     const dispatch = useAppDispatch()
 
@@ -38,7 +38,7 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
     const openCreateModal = useCallback(
         (overId?: string, addBefore?: boolean) => {
             openModal(
-                async data => {
+                async (data) => {
                     await dispatch(
                         createTodoThunk({
                             categoryId: selectedCategory.id,
@@ -59,7 +59,7 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
     const openUpdateModal = useCallback(
         (id: string, defaultValues?: PutTodoDTO) => {
             openModal(
-                async data => {
+                async (data) => {
                     const { taskEnd, value } = data
 
                     await dispatch(
@@ -107,14 +107,14 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
 
     const header = useMemo(() => {
         return (
-            <Stack direction='row' justifyContent='space-between' alignItems='center' height={80}>
-                <Typography variant='h5' fontWeight='bold'>
+            <Stack direction="row" justifyContent="space-between" alignItems="center" height={80}>
+                <Typography variant="h5" fontWeight="bold">
                     {selectedCategory.name}
                 </Typography>
                 <ToggleButton
-                    value='toggle'
-                    size='small'
-                    color='primary'
+                    value="toggle"
+                    size="small"
+                    color="primary"
                     selected={withCompleted}
                     onClick={() =>
                         dispatch(
@@ -133,7 +133,7 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
 
     const footer = useMemo(
         () => (
-            <Button size='large' onClick={() => openCreateModal(todos[todos.length - 1]?.id)}>
+            <Button size="large" onClick={() => openCreateModal(todos[todos.length - 1]?.id)}>
                 Добавить задачу
             </Button>
         ),
@@ -154,7 +154,7 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
                     openAddModal={openCreateModal}
                 />
             )}
-            renderOverlay={item => (
+            renderOverlay={(item) => (
                 <Box height={44} boxShadow={3}>
                     <TodoItemContent item={item} />
                 </Box>

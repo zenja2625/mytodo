@@ -71,7 +71,6 @@ export const useDnd = <T extends TreeItem>(
 
     const dragEnd = useCallback(() => {
         document.body.style.cursor = ''
-        document.body.style.scrollBehavior = ''
         onDrop(order[activeIndex].id, order[overIndex].id, depth)
 
         setActiveIndex(-1)
@@ -92,7 +91,6 @@ export const useDnd = <T extends TreeItem>(
                 setInitialPosition(initialPosition)
 
                 document.body.style.cursor = 'move'
-                document.body.style.scrollBehavior = 'hidden'
             }
         },
         []
