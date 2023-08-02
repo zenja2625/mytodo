@@ -9,6 +9,7 @@ type RegisterFields = {
     name: TextField
     password: TextField
     confirmPassword: TextField
+    date: OptionalDateField
 }
 
 type CategoryFields = {
@@ -39,7 +40,7 @@ export const registerFields: RegisterFields = {
         type: 'text',
         required: 'This field is required',
         placeholder: 'Login',
-        focus: true
+        focus: true,
     },
     password: {
         type: 'password',
@@ -52,6 +53,9 @@ export const registerFields: RegisterFields = {
         required: 'This field is required',
         minLength: { value: 4, message: 'Не менее 4 символов' },
         placeholder: 'Confirm Password',
+    },
+    date: {
+        type: 'date',
     },
 }
 

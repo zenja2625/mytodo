@@ -33,5 +33,9 @@ export const Register = () => {
         },
     }
 
-    return <Form fields={registerFields} onSubmit={onSubmit} validates={validates} />
+    return (
+        <div style={{ backgroundColor: 'orangered' }}>
+            <Form fields={registerFields} onSubmit={onSubmit} validates={validates} />
+        </div>
+    )
 }

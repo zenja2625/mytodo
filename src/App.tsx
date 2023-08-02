@@ -8,6 +8,8 @@ import { CategoryParamsType } from './containers/types'
 import { initializeApp } from './slices/appSlice'
 import { useAppDispatch, useAppSelector } from './slices/store'
 import moment from 'moment'
+import { LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 
 export const App = () => {
     const { categoryId } = useParams<CategoryParamsType>()
@@ -24,9 +26,11 @@ export const App = () => {
     if (!initialized) return <LoadPage />
 
     return (
-        <ModalProvider>
-            <Header />
-            <Outlet />
-        </ModalProvider>
+        <LocalizationProvider dateAdapter={AdapterMoment}>
+            <ModalProvider>
+                <Header />
+                <Outlet />
+            </ModalProvider>
+        </LocalizationProvider>
     )
 }
