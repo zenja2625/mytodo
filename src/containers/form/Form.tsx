@@ -1,19 +1,9 @@
-import { Control, Controller, DeepPartial, Path, useForm } from 'react-hook-form'
-import {
-    DateFieldBase,
-    Field,
-    FormData,
-    ItemDataType,
-    Items,
-    KeysMatching1,
-    PartialFormData,
-    Validate,
-} from './types'
+import { Controller, DeepPartial, Path, useForm } from 'react-hook-form'
+import { FormData, Items, PartialFormData, Validate } from './types'
 import { Ref, forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import moment from 'moment'
-import { serverDateFormat } from '../../dateFormat'
 import { Stack } from '@mui/system'
-import { TextField } from '@mui/material'
+import { Button, CircularProgress, Icon, TextField } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers'
 
 export type FormRef = {
@@ -35,10 +25,11 @@ type FormProps<T> = {
     defaultValues?: DeepPartial<FormData<T>>
     validates?: Validate<T>
     hideButton?: boolean
+    size?: 'small' | 'medium'
 }
 
 const FormInner: FormComponent = (
-    { fields, defaultValues, validates, hideButton, onSubmit },
+    { fields, defaultValues, validates, hideButton, size = 'small', onSubmit },
     ref
 ) => {
     const refFormCheck = useRef<
@@ -47,9 +38,6 @@ const FormInner: FormComponent = (
 
     const {
         handleSubmit,
-        register,
-        getValues,
-        setValue,
         setFocus,
         clearErrors,
         getFieldState,
@@ -75,7 +63,6 @@ const FormInner: FormComponent = (
         if (keys.length > 0) {
             const key = keys[0] as Path<FormData<typeof fields>>
             setFocus(key)
-            // console.log('Set Focus')
         }
     }, [fields, setFocus])
 
@@ -101,12 +88,11 @@ const FormInner: FormComponent = (
         const error = errors[key]?.message
         const stringError = typeof error === 'string' ? error : undefined
 
-        let input: JSX.Element
-
         switch (field.type) {
             case 'text':
-                input = (
+                return (
                     <Controller
+                        key={key}
                         name={key}
                         control={control}
                         rules={{
@@ -118,12 +104,13 @@ const FormInner: FormComponent = (
                                 : undefined,
                         }}
                         render={({ field: fieldRender }) => {
-                            const value = fieldRender.value as string
+                            const value =
+                                typeof fieldRender.value === 'string' ? fieldRender.value : ''
 
                             return (
                                 <TextField
                                     fullWidth
-                                    size='small'
+                                    size={size}
                                     error={!!stringError}
                                     helperText={stringError}
                                     required={!!field.required}
@@ -136,10 +123,10 @@ const FormInner: FormComponent = (
                         }}
                     />
                 )
-                break
             case 'date':
-                input = (
+                return (
                     <Controller
+                        key={key}
                         name={key}
                         control={control}
                         rules={{
@@ -154,45 +141,26 @@ const FormInner: FormComponent = (
                                 ? fieldRender.value
                                 : undefined
 
-                            const defaultValue = moment()
-                            // defaultValue.set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
-                            // defaultValue.subtract(1, 'seconds')
-                            console.log(defaultValue)
+                            const minDate = moment()
 
                             return (
                                 <DatePicker
                                     slotProps={{
-                                        textField: { fullWidth: true, size: 'small' },
+                                        textField: { fullWidth: true, size },
                                     }}
                                     onChange={fieldRender.onChange}
                                     defaultValue={value}
-                                    minDate={defaultValue}
+                                    minDate={minDate}
+                                    label={field.placeholder}
                                 />
-                                // <input
-                                //     type='date'
-                                //     placeholder='asd'
-                                //     onChange={event =>
-                                //         field.onChange(
-                                //             event.currentTarget.value
-                                //                 ? moment(
-                                //                       event.currentTarget.value,
-                                //                       serverDateFormat
-                                //                   )
-                                //                 : null
-                                //         )
-                                //     }
-                                //     onBlur={field.onBlur}
-                                //     value={value}
-                                // />
                             )
                         }}
                     />
                 )
-
-                break
             case 'password':
-                input = (
+                return (
                     <Controller
+                        key={key}
                         name={key}
                         control={control}
                         rules={{
@@ -204,13 +172,14 @@ const FormInner: FormComponent = (
                                 : undefined,
                         }}
                         render={({ field: fieldRender }) => {
-                            const value = fieldRender.value as string
+                            const value =
+                                typeof fieldRender.value === 'string' ? fieldRender.value : ''
 
                             return (
                                 <TextField
                                     fullWidth
                                     type='password'
-                                    size='small'
+                                    size={size}
                                     error={!!stringError}
                                     helperText={stringError}
                                     required={!!field.required}
@@ -223,25 +192,27 @@ const FormInner: FormComponent = (
                         }}
                     />
                 )
-                break
         }
-
-        return (
-            <div key={key} style={{ backgroundColor: 'aliceblue' }}>
-                {input}
-                {/* <div>{stringError}</div> */}
-            </div>
-        )
     })
 
     return (
-        <form
-            style={{ display: 'flex', flexDirection: 'column' }}
-            onSubmit={handleSubmit(onSubmit)}
-        >
-            <Stack>{inputs}</Stack>
-            <input hidden={hideButton} disabled={!canSubmit} type='submit' />
-        </form>
+        <Stack component={'form'} onSubmit={handleSubmit(onSubmit)} spacing={2}>
+            {inputs}
+            {!hideButton && (
+                <Button
+                    type='submit'
+                    size={size}
+                    variant='contained'
+                    disabled={!canSubmit}
+                    startIcon={<Icon />}
+                    endIcon={
+                        isSubmitting ? <CircularProgress color='inherit' size={18} /> : <Icon />
+                    }
+                >
+                    Отправить запрос
+                </Button>
+            )}
+        </Stack>
     )
 }
 

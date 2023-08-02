@@ -9,7 +9,6 @@ type RegisterFields = {
     name: TextField
     password: TextField
     confirmPassword: TextField
-    date: OptionalDateField
 }
 
 type CategoryFields = {
@@ -54,9 +53,6 @@ export const registerFields: RegisterFields = {
         minLength: { value: 4, message: 'Не менее 4 символов' },
         placeholder: 'Confirm Password',
     },
-    date: {
-        type: 'date',
-    },
 }
 
 export const categoryFields: CategoryFields = {
@@ -75,5 +71,6 @@ export const todoFields: TodoFields = {
     },
     taskEnd: {
         type: 'date',
+        placeholder: 'Task End',
     },
 }
