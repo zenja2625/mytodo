@@ -5,6 +5,7 @@ import { registerThunk } from '../../slices/accountSlice'
 import { useAppDispatch } from '../../slices/store'
 import { Form } from '../form/Form'
 import { Validate } from '../form/types'
+import { Box, Stack, Typography } from '@mui/material'
 
 export const Register = () => {
     const dispath = useAppDispatch()
@@ -34,8 +35,19 @@ export const Register = () => {
     }
 
     return (
-        <div>
-            <Form fields={registerFields} onSubmit={onSubmit} validates={validates} />
-        </div>
+        <Box flexGrow={1} alignItems={'center'} justifyContent={'center'} display={'flex'}>
+            <Stack maxWidth={'400px'} spacing={3} flexGrow={1} m={4}>
+                <Typography textAlign='center' variant='h4'>
+                    Sign up
+                </Typography>
+                <Form
+                    fields={registerFields}
+                    onSubmit={onSubmit}
+                    validates={validates}
+                    size='medium'
+                    submitText='Зарегистрироваться'
+                />
+            </Stack>
+        </Box>
     )
 }

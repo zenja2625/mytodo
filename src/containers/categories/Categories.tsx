@@ -124,6 +124,7 @@ export const Categories = () => {
                 <List>
                     {categories.map(category => (
                         <CategoryItem
+                            key={category.id}
                             id={category.id}
                             name={category.name}
                             openEdit={openEditEditor}

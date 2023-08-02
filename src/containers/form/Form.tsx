@@ -26,10 +26,19 @@ type FormProps<T> = {
     validates?: Validate<T>
     hideButton?: boolean
     size?: 'small' | 'medium'
+    submitText?: string
 }
 
 const FormInner: FormComponent = (
-    { fields, defaultValues, validates, hideButton, size = 'small', onSubmit },
+    {
+        fields,
+        defaultValues,
+        validates,
+        hideButton,
+        submitText = 'Отправить запрос',
+        size = 'small',
+        onSubmit,
+    },
     ref
 ) => {
     const refFormCheck = useRef<
@@ -209,7 +218,7 @@ const FormInner: FormComponent = (
                         isSubmitting ? <CircularProgress color='inherit' size={18} /> : <Icon />
                     }
                 >
-                    Отправить запрос
+                    {submitText}
                 </Button>
             )}
         </Stack>
