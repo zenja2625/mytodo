@@ -8,7 +8,7 @@ import { getTodosThunk } from './todosSlice'
 const initialState: AppType = {
     initialized: false,
     requestCount: 0,
-    siderCollapsed: true,
+    siderCollapsed: false,
 }
 
 interface RejectedAction extends Action {

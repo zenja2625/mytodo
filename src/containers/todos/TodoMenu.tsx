@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import { Menu, MenuItem } from '@mui/material'
 import React from 'react'
 
@@ -9,7 +9,7 @@ type TodoMenuProps = {
 }
 
 export const TodoMenu: FC<TodoMenuProps> = ({ switchEvent }) => {
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
     const isOpen = !!anchorEl
     const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
         setAnchorEl(event.currentTarget)

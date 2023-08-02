@@ -1,4 +1,4 @@
-import { FC, useCallback, useContext } from 'react'
+import { FC, useCallback, useContext, useState } from 'react'
 import { Category } from '../../slices/sliceTypes'
 import { useNavigate } from 'react-router-dom'
 import { DeepPartial, DefaultValues } from 'react-hook-form'
@@ -9,6 +9,10 @@ import {
     updateCategoryThunk,
 } from '../../slices/categoriesSlice'
 import { CategoryRequestDTO } from '../../api/apiTypes'
+import { ListItem, IconButton, ListItemButton, ListItemText, Menu, MenuItem } from '@mui/material'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
+
+type MenuKeys = 'edit' | 'remove'
 
 export const CategoryItem: FC<
     Category & {
@@ -16,57 +20,60 @@ export const CategoryItem: FC<
         selected?: boolean
     }
 > = ({ id, name, selected, openEdit }) => {
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+    const isOpen = !!anchorEl
+    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget)
+    }
+    const handleClose = () => {
+        setAnchorEl(null)
+    }
+
+    const onMenuClick = (key: MenuKeys) => {
+        switchEvent(key)
+        setAnchorEl(null)
+    }
+
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
 
-    // const { openModal } = useContext(modalContext)
+    const switchEvent = (key: MenuKeys) => {
+        switch (key) {
+            case 'edit':
+                openEdit(id, { name })
+                break
 
-    const onClick = useCallback(() => {
-        // dispatch(setSelectedCategory({ id, name }))
-        navigate(`/category/${id}`)
-    }, [id, navigate])
-
-    // const fields: FormFieldsType<CategoryRequestDTO> = {
-    //     name: {
-    //         options: {
-    //             required: 'True',
-    //         },
-    //     },
-    // }
-    // const defaultValues: DeepPartial<CategoryRequestDTO> = {
-    //     name,
-    // }
-
-    // const modalProps: FormType<CategoryRequestDTO> = {
-    //     fields,
-    //     onSubmit: async data => {
-    //         await dispatch(updateCategoryThunk({ id, ...data }))
-    //     },
-    //     defaultValues,
-    // }
+            case 'remove':
+                const response = window.confirm('Remove this item')
+                if (response) dispatch(deleteCategoryThunk(id))
+                break
+        }
+    }
 
     return (
-        <div style={{ backgroundColor: selected ? 'red' : undefined }} onClick={onClick}>
-            {name}
-            <button
-                onClick={() => {
-                    openEdit(id, { name })
-                    // openModal(modalProps)
-                }}
+        <>
+            <ListItem
+                key={id}
+                secondaryAction={
+                    <IconButton onClick={handleClick} edge='end' color='inherit'>
+                        <MoreVertIcon />
+                    </IconButton>
+                }
+                disablePadding
             >
-                Edit
-            </button>
-            <button
-                onClick={e => {
-                    e.stopPropagation()
-
-                    const response = window.confirm('Remove this item')
-
-                    if (response) dispatch(deleteCategoryThunk(id))
-                }}
+                <ListItemButton selected={selected} onClick={() => navigate(`/category/${id}`)}>
+                    <ListItemText primary={name} />
+                </ListItemButton>
+            </ListItem>
+            <Menu
+                disableAutoFocusItem={true}
+                anchorEl={anchorEl}
+                open={isOpen}
+                onClose={handleClose}
             >
-                Remove
-            </button>
-        </div>
+                <MenuItem onClick={() => onMenuClick('edit')}>Изменить</MenuItem>
+                <MenuItem onClick={() => onMenuClick('remove')}>Удалить</MenuItem>
+            </Menu>
+        </>
     )
 }

@@ -1,4 +1,4 @@
-import { useCallback, useContext } from 'react'
+import { useCallback, useContext, useEffect, useRef } from 'react'
 import { useAppDispatch, useAppSelector } from '../../slices/store'
 import { CategoryItem } from './CategoryItem'
 import {
@@ -12,8 +12,27 @@ import { categoryFields } from '../../forms'
 import { DeepPartial } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { CategoryParamsType } from '../types'
+import {
+    Box,
+    Button,
+    Drawer,
+    IconButton,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    ModalProps,
+    Stack,
+    Typography,
+    useMediaQuery,
+    useTheme,
+} from '@mui/material'
+import { toggleSider } from '../../slices/appSlice'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
 
 export const Categories = () => {
+    const prevSmallScreen = useRef<boolean | null>(null)
     // const { categoryId } = useParams<CategoryParamsType>()
 
     const selectedCategory = useAppSelector(state => state.categories.selected)
@@ -26,7 +45,22 @@ export const Categories = () => {
 
     const open = useModal(categoryFields)
 
+    const theme = useTheme()
+    const smallScreen = useMediaQuery(theme.breakpoints.down('sm'))
+
     const className = 'categories' + (siderCollapsed ? ' hidden' : '')
+
+    useEffect(() => {
+        if (prevSmallScreen.current !== smallScreen) {
+            if (smallScreen && !siderCollapsed) {
+                dispatch(toggleSider())
+            } else if (!smallScreen && siderCollapsed) {
+                dispatch(toggleSider())
+            }
+        }
+
+        prevSmallScreen.current = smallScreen
+    }, [smallScreen, siderCollapsed, dispatch])
 
     const onCreateSubmit = useCallback(
         //todo Error handling
@@ -67,19 +101,54 @@ export const Categories = () => {
         [dispatch]
     )
 
+    const modalProps: Partial<ModalProps> | undefined = {
+        style: { top: '60px' },
+        BackdropProps: {
+            style: {
+                top: '60px',
+            },
+        },
+    }
+
     return (
-        <div className={className}>
-            Categories:
-            {categories.map(item => (
-                <CategoryItem
-                    key={item.id}
-                    {...item}
-                    selected={item.id === selectedCategory?.id}
-                    openEdit={openEditEditor}
-                />
-            ))}
-            <CategoryItem id='asd' name='Test' openEdit={openEditEditor} />
-            <button onClick={() => openCreateEditor()}>Новая Категория</button>
-        </div>
+        <Drawer
+            PaperProps={{ style: { top: '60px', border: 'none', backgroundColor: '#FAFAFA' } }}
+            ModalProps={modalProps}
+            variant={smallScreen ? 'temporary' : 'persistent'}
+            style={siderCollapsed ? undefined : { width: '250px' }}
+            open={!siderCollapsed}
+            onClose={() => dispatch(toggleSider())}
+        >
+            <Box width={250} boxSizing='border-box' p={1}>
+                <Typography variant='h5'>Категории</Typography>
+                <List>
+                    {categories.map(category => (
+                        <CategoryItem
+                            id={category.id}
+                            name={category.name}
+                            openEdit={openEditEditor}
+                            selected={category.id === selectedCategory?.id}
+                        />
+                        // <ListItem
+                        //     key={category.id}
+                        //     secondaryAction={
+                        //         <IconButton edge='end' color='inherit'>
+                        //             <MoreVertIcon />
+                        //         </IconButton>
+                        //     }
+                        //     disablePadding
+                        // >
+                        //     <ListItemButton
+                        //         selected={category.id === selectedCategory?.id}
+                        //         onClick={() => navigate(`/category/${category.id}`)}
+                        //     >
+                        //         <ListItemText primary={category.name} />
+                        //     </ListItemButton>
+                        // </ListItem>
+                    ))}
+                    <Button onClick={() => openCreateEditor()}>Новая Категория</Button>
+                </List>
+            </Box>
+        </Drawer>
     )
 }
