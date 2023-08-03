@@ -1,8 +1,3 @@
-#root {
-    display: flex;
-    flex-direction: column;
-}
-
 .header {
     height: 60px;
     background-color: #001529;

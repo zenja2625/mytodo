@@ -1,19 +1,7 @@
-export const LoadPage = () => {
+import { Box, CircularProgress } from '@mui/material'
 
-    
-
-    return (
-        <div
-            style={{
-                height: '100%',
-                flexGrow: 1,
-                backgroundColor: 'red',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-            }}
-        >
-            Загрузака!
-        </div>
-    )
-}
+export const LoadPage = () => (
+    <Box bgcolor='white' height='100%' display='flex' justifyContent='center' alignItems='center'>
+        <CircularProgress />
+    </Box>
+)

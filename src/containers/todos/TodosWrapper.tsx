@@ -8,6 +8,7 @@ import { useLoadDelay } from '../../hooks/useLoadDelay'
 import { getTodosThunk } from '../../slices/todosSlice'
 import { Category } from '../../slices/sliceTypes'
 import { Box, Container } from '@mui/material'
+import { LoadPage } from '../LoadPage'
 
 export const TodosWrapper = () => {
     const prevSelectedCategoryRef = useRef<Category | null>(null)
@@ -20,19 +21,7 @@ export const TodosWrapper = () => {
         return prevSelectedCategoryRef.current
     }, [selectedCategory, todosRequestId])
 
-    // useEffect(() => {
-    //     console.log('selectedCategory')
-    // }, [selectedCategory])
-
-    // useEffect(() => {
-    //     console.log(`todosRequestId ${todosRequestId}`)
-    // }, [todosRequestId])
-
-    // useEffect(() => {
-    //     console.log('use Effect')
-    // })
-
-    const showLoadPage = useLoadDelay(!!todosRequestId, 200)
+    const showLoadPage = useLoadDelay(!!todosRequestId, 500)
 
     const style: CSSProperties | undefined = !!todosRequestId
         ? {
@@ -52,7 +41,7 @@ export const TodosWrapper = () => {
             </div>
             {showLoadPage && (
                 <div className='todos-wrapper'>
-                    <div className='todos-wrapper-center'>Loading...</div>
+                    <LoadPage />
                 </div>
             )}
         </div>
