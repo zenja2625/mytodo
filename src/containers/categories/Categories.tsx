@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useRef } from 'react'
+import { useCallback, useContext, useEffect, useId, useRef } from 'react'
 import { useAppDispatch, useAppSelector } from '../../slices/store'
 import { CategoryItem } from './CategoryItem'
 import {
@@ -110,6 +110,7 @@ export const Categories = () => {
         },
     }
 
+
     return (
         <Drawer
             PaperProps={{ style: { top: '60px', border: 'none', backgroundColor: '#FAFAFA' } }}
@@ -130,22 +131,6 @@ export const Categories = () => {
                             openEdit={openEditEditor}
                             selected={category.id === selectedCategory?.id}
                         />
-                        // <ListItem
-                        //     key={category.id}
-                        //     secondaryAction={
-                        //         <IconButton edge='end' color='inherit'>
-                        //             <MoreVertIcon />
-                        //         </IconButton>
-                        //     }
-                        //     disablePadding
-                        // >
-                        //     <ListItemButton
-                        //         selected={category.id === selectedCategory?.id}
-                        //         onClick={() => navigate(`/category/${category.id}`)}
-                        //     >
-                        //         <ListItemText primary={category.name} />
-                        //     </ListItemButton>
-                        // </ListItem>
                     ))}
                     <Button onClick={() => openCreateEditor()}>Новая Категория</Button>
                 </List>

@@ -54,8 +54,13 @@ export const getTodosThunk = createAsyncThunk<
     { todos: Array<TodoDTO>; withCompleted: boolean },
     { categoryId: string; withCompleted: boolean },
     IState & RejectValueType
->('todos/getTodosThunk', async (payload, { rejectWithValue, dispatch }) => {
+>('todos/getTodosThunk', async (payload, { rejectWithValue, dispatch, getState }) => {
     try {
+        const { todoPositionDTOs, todoStatusDTOs } = getState().todos
+
+        if (todoPositionDTOs.length) await dispatch(updatePositionsThunk(payload.categoryId))
+        if (todoStatusDTOs.length) await dispatch(updateStatusesThunk(payload.categoryId))
+
         const response = await API.todos.getTodos(payload.categoryId, payload.withCompleted)
 
         return { todos: response.data as Array<TodoDTO>, withCompleted: payload.withCompleted }

@@ -28,11 +28,11 @@ import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 
 export const Todos = memo(({ selectedCategory }: { selectedCategory: Category }) => {
-    const withCompleted = useAppSelector((state) => state.todos.withCompleted)
+    const withCompleted = useAppSelector(state => state.todos.withCompleted)
     const todos = useAppSelector(getTodos)
 
-    const statuses = useAppSelector((state) => state.todos.todoStatusDTOs)
-    const positions = useAppSelector((state) => state.todos.todoPositionDTOs)
+    const statuses = useAppSelector(state => state.todos.todoStatusDTOs)
+    const positions = useAppSelector(state => state.todos.todoPositionDTOs)
 
     const dispatch = useAppDispatch()
 
@@ -41,7 +41,7 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
     const openCreateModal = useCallback(
         (overId?: string, addBefore?: boolean) => {
             openModal(
-                async (data) => {
+                async data => {
                     await dispatch(
                         createTodoThunk({
                             categoryId: selectedCategory.id,
@@ -62,7 +62,7 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
     const openUpdateModal = useCallback(
         (id: string, defaultValues?: PutTodoDTO) => {
             openModal(
-                async (data) => {
+                async data => {
                     const { taskEnd, value } = data
 
                     await dispatch(
@@ -98,8 +98,8 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
         [selectedCategory, dispatch]
     )
 
-    useDebounce(statuses, 200, fetchStatuses)
-    useDebounce(positions, 200, fetchPositions)
+    useDebounce(statuses, 500, fetchStatuses)
+    useDebounce(positions, 500, fetchPositions)
 
     const onDrop = useCallback(
         (id: string, overId: string, depth: number) => {
@@ -110,8 +110,8 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
 
     const header = useMemo(() => {
         return (
-            <Stack direction="row" justifyContent="space-between" alignItems="center" height={80}>
-                <Typography variant="h5" fontWeight="bold">
+            <Stack direction='row' justifyContent='space-between' alignItems='center' height={80}>
+                <Typography variant='h5' fontWeight='bold'>
                     {selectedCategory.name}
                 </Typography>
                 <IconButton
@@ -133,7 +133,7 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
 
     const footer = useMemo(
         () => (
-            <Button size="large" onClick={() => openCreateModal(todos[todos.length - 1]?.id)}>
+            <Button size='large' onClick={() => openCreateModal(todos[todos.length - 1]?.id)}>
                 Добавить задачу
             </Button>
         ),
@@ -154,7 +154,7 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
                     openAddModal={openCreateModal}
                 />
             )}
-            renderOverlay={(item) => (
+            renderOverlay={item => (
                 <Box height={44} boxShadow={3}>
                     <TodoItemContent item={item} />
                 </Box>
