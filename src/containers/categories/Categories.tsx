@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useId, useRef } from 'react'
+import { useCallback, useContext, useEffect, useId, useMemo, useRef } from 'react'
 import { useAppDispatch, useAppSelector } from '../../slices/store'
 import { CategoryItem } from './CategoryItem'
 import {
@@ -50,17 +50,18 @@ export const Categories = () => {
 
     const className = 'categories' + (siderCollapsed ? ' hidden' : '')
 
-    useEffect(() => {
-        if (prevSmallScreen.current !== smallScreen) {
-            if (smallScreen && !siderCollapsed) {
-                dispatch(toggleSider())
-            } else if (!smallScreen && siderCollapsed) {
-                dispatch(toggleSider())
-            }
+    const isOpen = useMemo(() => {
+        if (prevSmallScreen.current === smallScreen) {
+            return !siderCollapsed
+        } else {
+            prevSmallScreen.current = smallScreen
+            return !smallScreen
         }
+    }, [smallScreen, siderCollapsed])
 
-        prevSmallScreen.current = smallScreen
-    }, [smallScreen, siderCollapsed, dispatch])
+    useEffect(() => {
+        if (isOpen !== !siderCollapsed) dispatch(toggleSider())
+    }, [isOpen, siderCollapsed])
 
     const onCreateSubmit = useCallback(
         //todo Error handling
@@ -110,14 +111,13 @@ export const Categories = () => {
         },
     }
 
-
     return (
         <Drawer
             PaperProps={{ style: { top: '60px', border: 'none', backgroundColor: '#FAFAFA' } }}
             ModalProps={modalProps}
             variant={smallScreen ? 'temporary' : 'persistent'}
-            style={siderCollapsed ? undefined : { width: '250px' }}
-            open={!siderCollapsed}
+            style={!isOpen ? undefined : { width: '250px' }}
+            open={isOpen}
             onClose={() => dispatch(toggleSider())}
         >
             <Box width={250} boxSizing='border-box' p={1}>
