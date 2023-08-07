@@ -33,6 +33,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert'
 
 export const Categories = () => {
     const prevSmallScreen = useRef<boolean | null>(null)
+    const prevCategoryId = useRef<string | null>(null)
     // const { categoryId } = useParams<CategoryParamsType>()
 
     const selectedCategory = useAppSelector(state => state.categories.selected)
@@ -48,8 +49,6 @@ export const Categories = () => {
     const theme = useTheme()
     const smallScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
-    const className = 'categories' + (siderCollapsed ? ' hidden' : '')
-
     const isOpen = useMemo(() => {
         if (prevSmallScreen.current === smallScreen) {
             return !siderCollapsed
@@ -61,7 +60,17 @@ export const Categories = () => {
 
     useEffect(() => {
         if (isOpen !== !siderCollapsed) dispatch(toggleSider())
-    }, [isOpen, siderCollapsed])
+    }, [isOpen, siderCollapsed, dispatch])
+
+    useEffect(() => {
+        const selectedCategoryId = selectedCategory?.id || null
+
+        if (smallScreen && isOpen && prevCategoryId.current !== selectedCategoryId) {
+            dispatch(toggleSider())
+        }
+
+        prevCategoryId.current = selectedCategoryId
+    }, [selectedCategory, isOpen, smallScreen, dispatch])
 
     const onCreateSubmit = useCallback(
         //todo Error handling
