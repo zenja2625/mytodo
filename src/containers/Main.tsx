@@ -10,23 +10,12 @@ import { registerFields } from '../forms'
 
 export const Main = () => {
     const [isOpen, setIsOpen] = useState(true)
+    const [count, setCount] = useState(0)
 
     return (
         <main>
             <Categories />
             <TodosWrapper />
-            <ModalForm
-                modalTitle='Регистрация'
-                buttonValue='Регистрация'
-                isOpen={isOpen}
-                setIsOpen={setIsOpen}
-                fields={registerFields}
-                onSubmit={async () => {
-                    console.log('Submit')
-
-                    await new Promise(r => setTimeout(r, 3000))
-                }}
-            />
         </main>
     )
 }

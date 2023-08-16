@@ -18,7 +18,6 @@ import { SortableTree } from '../sortableTree/SortableTree'
 import { TodoItem1 } from './TodoItem1'
 import { useDebounce } from '../../hooks/useDebounce'
 import { TodoPositionDTO, TodoStatusDTO } from '../../api/apiTypes'
-import { useModal } from '../modal/useModal'
 import { todoFields } from '../../forms'
 import { areEqual } from 'react-window'
 import { Box, Button, IconButton, Paper, Stack, ToggleButton, Typography } from '@mui/material'
@@ -36,52 +35,32 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
 
     const dispatch = useAppDispatch()
 
-    const openModal = useModal(todoFields)
+    // const openModal = useModal(todoFields)
 
     const openCreateModal = useCallback(
         (overId?: string, addBefore?: boolean) => {
-            openModal(
-                async data => {
-                    await dispatch(
-                        createTodoThunk({
-                            categoryId: selectedCategory.id,
-                            value: data.value,
-                            taskEnd: data.taskEnd,
-                            overId,
-                            addBefore,
-                        })
-                    )
-                },
-                'Create Todo',
-                'Create'
-            )
+            // openModal(
+            //     async data => {
+            //         await dispatch(
+            //             createTodoThunk({
+            //                 categoryId: selectedCategory.id,
+            //                 value: data.value,
+            //                 taskEnd: data.taskEnd,
+            //                 overId,
+            //                 addBefore,
+            //             })
+            //         )
+            //     },
+            //     'Create Todo',
+            //     'Create'
+            // )
         },
-        [selectedCategory, dispatch, openModal]
+        [selectedCategory, dispatch]
     )
 
     const openUpdateModal = useCallback(
-        (id: string, defaultValues?: PutTodoDTO) => {
-            openModal(
-                async data => {
-                    const { taskEnd, value } = data
-
-                    await dispatch(
-                        updateTodoThunk({
-                            categoryId: selectedCategory.id,
-                            id,
-                            todoDTO: {
-                                value,
-                                taskEnd,
-                            },
-                        })
-                    )
-                },
-                'Update Todo',
-                'Update',
-                defaultValues
-            )
-        },
-        [selectedCategory, dispatch, openModal]
+        (id: string, defaultValues?: PutTodoDTO) => {},
+        [selectedCategory, dispatch]
     )
 
     const fetchPositions = useCallback(

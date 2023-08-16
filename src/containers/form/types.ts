@@ -1,4 +1,11 @@
-import { Path, PathValue, UseFormGetFieldState, UseFormTrigger, ValidationRule } from 'react-hook-form'
+import {
+    DeepPartial,
+    Path,
+    PathValue,
+    UseFormGetFieldState,
+    UseFormTrigger,
+    ValidationRule,
+} from 'react-hook-form'
 import { Moment } from 'moment'
 
 type FieldBase = {
@@ -57,5 +64,14 @@ export type Validate<T> = Partial<{
         getFieldState: UseFormGetFieldState<FormData<T>>
     ) => string | undefined
 }>
+
+export type FormProps<T extends Items> = {
+    fields: T
+    onSubmit: (data: PartialFormData<T>) => Promise<void>
+    defaultValues?: DeepPartial<FormData<T>>
+    validates?: Validate<T>
+    size?: 'small' | 'medium'
+    submitText?: string
+}
 
 export type FieldComponent<T extends Field> = ({}) => JSX.Element

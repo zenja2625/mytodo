@@ -3,7 +3,6 @@ import { Outlet, useParams } from 'react-router-dom'
 import './App.css'
 import { Header } from './components/header/Header'
 import { LoadPage } from './containers/LoadPage'
-import { ModalProvider } from './containers/modal/ModalProvider'
 import { CategoryParamsType } from './containers/types'
 import { initializeApp } from './slices/appSlice'
 import { useAppDispatch, useAppSelector } from './slices/store'
@@ -27,10 +26,8 @@ export const App = () => {
 
     return (
         <LocalizationProvider dateAdapter={AdapterMoment}>
-            <ModalProvider>
-                <Header />
-                <Outlet />
-            </ModalProvider>
+            <Header />
+            <Outlet />
         </LocalizationProvider>
     )
 }

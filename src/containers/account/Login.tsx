@@ -19,7 +19,7 @@ export const Login = () => {
 
     return (
         <Box flexGrow={1} alignItems={'center'} justifyContent={'center'} display={'flex'}>
-            <Stack maxWidth={'400px'} spacing={3} flexGrow={1} m={4}>
+            <Stack maxWidth='400px' spacing={3} flexGrow={1} m={4}>
                 <Typography textAlign='center' variant='h4'>
                     Log In
                 </Typography>

@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useId, useMemo, useRef } from 'react'
+import { useCallback, useContext, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../slices/store'
 import { CategoryItem } from './CategoryItem'
 import {
@@ -7,7 +7,6 @@ import {
     updateCategoryThunk,
 } from '../../slices/categoriesSlice'
 import { CategoryRequestDTO } from '../../api/apiTypes'
-import { useModal } from '../modal/useModal'
 import { categoryFields } from '../../forms'
 import { DeepPartial } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -30,11 +29,16 @@ import {
 } from '@mui/material'
 import { toggleSider } from '../../slices/appSlice'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
+import { FormData } from '../form/types'
+import { ModalForm } from '../form/ModalForm'
 
 export const Categories = () => {
     const prevSmallScreen = useRef<boolean | null>(null)
     const prevCategoryId = useRef<string | null>(null)
     // const { categoryId } = useParams<CategoryParamsType>()
+
+    const [editId, setEditId] = useState('')
+    const [defaultEditValues, setDefaultEditValues] = useState<DeepPartial<CategoryRequestDTO>>()
 
     const selectedCategory = useAppSelector(state => state.categories.selected)
     const categories = useAppSelector(state => state.categories.items)
@@ -44,7 +48,7 @@ export const Categories = () => {
 
     const navigate = useNavigate()
 
-    const open = useModal(categoryFields)
+    // const open = useModal(categoryFields)
 
     const theme = useTheme()
     const smallScreen = useMediaQuery(theme.breakpoints.down('sm'))
@@ -94,21 +98,16 @@ export const Categories = () => {
     )
 
     const openCreateEditor = () => {
-        open(onCreateSubmit, 'Create Category', 'Create')
+        setEditId('new')
+        setDefaultEditValues(undefined)
     }
 
     const openEditEditor = useCallback(
         (id: string, defaultValues: DeepPartial<CategoryRequestDTO>) => {
-            open(
-                async data => {
-                    await dispatch(updateCategoryThunk({ id, name: data.name }))
-                },
-                'Update Category',
-                'Update',
-                defaultValues
-            )
+            setEditId(id)
+            setDefaultEditValues(defaultValues)
         },
-        [dispatch]
+        []
     )
 
     const modalProps: Partial<ModalProps> | undefined = {
@@ -121,29 +120,46 @@ export const Categories = () => {
     }
 
     return (
-        <Drawer
-            PaperProps={{ style: { top: '60px', border: 'none', backgroundColor: '#FAFAFA' } }}
-            ModalProps={modalProps}
-            variant={smallScreen ? 'temporary' : 'persistent'}
-            style={!isOpen ? undefined : { width: '250px' }}
-            open={isOpen}
-            onClose={() => dispatch(toggleSider())}
-        >
-            <Box width={250} boxSizing='border-box' p={1}>
-                <Typography variant='h5'>Категории</Typography>
-                <List>
-                    {categories.map(category => (
-                        <CategoryItem
-                            key={category.id}
-                            id={category.id}
-                            name={category.name}
-                            openEdit={openEditEditor}
-                            selected={category.id === selectedCategory?.id}
-                        />
-                    ))}
-                    <Button onClick={() => openCreateEditor()}>Новая Категория</Button>
-                </List>
-            </Box>
-        </Drawer>
+        <>
+            <Drawer
+                PaperProps={{ style: { top: '60px', border: 'none', backgroundColor: '#FAFAFA' } }}
+                ModalProps={modalProps}
+                variant={smallScreen ? 'temporary' : 'persistent'}
+                style={!isOpen ? undefined : { width: '250px' }}
+                open={isOpen}
+                onClose={() => dispatch(toggleSider())}
+            >
+                <Box width={250} boxSizing='border-box' p={1}>
+                    <Typography variant='h5'>Категории</Typography>
+                    <List>
+                        {categories.map(category => (
+                            <CategoryItem
+                                key={category.id}
+                                id={category.id}
+                                name={category.name}
+                                openEdit={openEditEditor}
+                                selected={category.id === selectedCategory?.id}
+                            />
+                        ))}
+                        <Button onClick={() => openCreateEditor()}>Новая Категория</Button>
+                    </List>
+                </Box>
+            </Drawer>
+            <ModalForm
+                fields={categoryFields}
+                isOpen={!!editId}
+                //@ts-ignore
+                onSubmit={async (data, e) => {
+
+                    await new Promise(r => setTimeout(r, 1000))
+                    console.log(e)
+
+                    // alert(JSON.stringify(data, null, 2))
+                }}
+                setIsOpen={() => setEditId('')}
+                title='Title'
+                defaultValues={defaultEditValues}
+            />
+        </>
     )
 }

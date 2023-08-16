@@ -1,81 +1,57 @@
-import { Controller, DeepPartial, Path, useForm, UseFormHandleSubmit } from 'react-hook-form'
-import { FormData, Items, PartialFormData, Validate } from './types'
-import { Ref, forwardRef, useEffect, useImperativeHandle, useRef, useCallback } from 'react'
-import moment from 'moment'
+import { FormProps, Items } from './types'
+import { useEffect, useCallback } from 'react'
 import { Stack } from '@mui/system'
 import {
     Button,
     ButtonProps,
-    ButtonTypeMap,
     CircularProgress,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
-    ExtendButtonBase,
-    Icon,
-    TextField,
 } from '@mui/material'
-import { DatePicker } from '@mui/x-date-pickers'
 import { useFormController } from './useFormController'
 
-export type FormRef = {
-    submit: () => Promise<void>
-    subscribeFormCheck: (
-        updateFormStatus: (
-            isButtonDisabled: boolean,
-            isSubmitting: boolean,
-            isSubmitSuccessful: boolean
-        ) => void
-    ) => void
-}
-
-type FormComponent = <T extends Items>(props: FormProps<T>, ref?: Ref<FormRef>) => JSX.Element
-
-type FormProps<T> = {
-    fields: T
-    onSubmit: (data: PartialFormData<T>) => Promise<void>
-    defaultValues?: DeepPartial<FormData<T>>
-    validates?: Validate<T>
-    hideButton?: boolean
-    size?: 'small' | 'medium'
-    submitText?: string
-
+type ModalFormProps<T extends Items> = {
     isOpen: boolean
     setIsOpen: (value: boolean) => void
-    modalTitle: string
-    buttonValue: string
-}
+    title: string
+} & FormProps<T>
 
-const FormInner: FormComponent = (
-    {
-        fields,
-        isOpen,
-        setIsOpen,
-        modalTitle,
-        buttonValue,
-        defaultValues,
-        validates,
-        hideButton,
-        submitText = 'Отправить запрос',
-        size = 'small',
-        onSubmit,
-    },
-    ref
-) => {
-    const refFormCheck = useRef<
-        (isButtonDisabled: boolean, isSubmitting: boolean, isSubmitSuccessful: boolean) => void
-    >(() => {})
+export const ModalForm = <T extends Items>({
+    fields,
+    isOpen,
+    setIsOpen,
+    title,
+    submitText = 'Отправить запрос',
+    defaultValues,
+    validates,
+    size = 'small',
+    onSubmit,
+}: ModalFormProps<T>) => {
+    const { canSubmit, handleSubmit, reset, inputs, isSubmitting, isSubmitSuccessful } =
+        useFormController(fields, size, validates)
 
-    const { canSubmit, handleSubmit, inputs, isSubmitting, isSubmitSuccessful } =
-        useFormController(fields)
+    useEffect(() => {
+        if (isOpen) {
+            if (defaultValues) {
+                reset(defaultValues)
+            } else {
+                console.log('New')
+                reset()
+            }
+        }
+    }, [isOpen, defaultValues, reset])
 
     const close = useCallback(() => {
         setIsOpen(false)
     }, [setIsOpen])
 
     useEffect(() => {
-        if (isSubmitSuccessful) close()
+        if (isSubmitSuccessful) {
+            reset()
+            close()
+        }
     }, [isSubmitSuccessful, close])
 
     const buttonProps: ButtonProps = {
@@ -84,15 +60,10 @@ const FormInner: FormComponent = (
     }
 
     return (
-        <Dialog disableAutoFocus onClose={close} open={isOpen}>
-            <DialogTitle>{modalTitle}</DialogTitle>
-            <DialogContent>
-                <Stack
-                    component={'form'}
-                    onSubmit={handleSubmit(onSubmit)}
-                    spacing={2}
-                    marginTop={1}
-                >
+        <Dialog maxWidth='xs' fullWidth disableAutoFocus onClose={close} open={isOpen}>
+            <DialogTitle>{title}</DialogTitle>
+            <DialogContent sx={{ paddingBottom: '0px' }}>
+                <Stack component={'form'} onSubmit={handleSubmit(onSubmit)} marginTop={1}>
                     {inputs}
                     <input disabled={isSubmitting} hidden type='submit' />
                 </Stack>
@@ -109,13 +80,9 @@ const FormInner: FormComponent = (
                         isSubmitting ? <CircularProgress color='inherit' size={18} /> : undefined
                     }
                 >
-                    {buttonValue}
+                    {submitText}
                 </Button>
             </DialogActions>
         </Dialog>
     )
 }
-
-export const ModalForm = forwardRef(FormInner) as <T extends Items>(
-    props: FormProps<T> & { ref?: Ref<FormRef> }
-) => JSX.Element

@@ -15,38 +15,27 @@ import {
 } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers'
 
-const foo = () => {}
-
 export const useFormController = <T extends Items>(
     fields: T,
-    defaultValues?: DeepPartial<FormData<T>>,
     size: 'small' | 'medium' = 'small',
-    validates?: Validate<T>
+    validates?: Validate<T>,
+    defaultValues?: DeepPartial<FormData<T>>
 ) => {
     const {
         handleSubmit,
-        setFocus,
         clearErrors,
         getFieldState,
         trigger,
+        reset,
         control,
         formState: { errors, isSubmitting, isDirty, isValid, isSubmitSuccessful },
-    } = useForm({ mode: 'onTouched', defaultValues })
+    } = useForm<FormData<T>>({ mode: 'onTouched', defaultValues, delayError: 200 })
 
     const canSubmit = !isSubmitting && isDirty && isValid
 
     useEffect(() => {
         if (canSubmit) clearErrors()
     }, [canSubmit, clearErrors])
-
-    // useEffect(() => {
-    //     const keys = Object.keys(fields)
-
-    //     if (keys.length > 0) {
-    //         const key = keys[0] as Path<FormData<typeof fields>>
-    //         setFocus(key)
-    //     }
-    // }, [fields, setFocus])
 
     const inputs = Object.keys(fields).map(objectKey => {
         const key = objectKey as Path<FormData<typeof fields>>
@@ -77,15 +66,19 @@ export const useFormController = <T extends Items>(
 
                             return (
                                 <TextField
+                                    autoFocus={field.focus}
                                     fullWidth
                                     size={size}
                                     error={!!stringError}
-                                    helperText={stringError}
+                                    helperText={stringError || ' '}
                                     required={!!field.required}
                                     label={field.placeholder}
                                     value={value}
                                     onChange={fieldRender.onChange}
                                     onBlur={fieldRender.onBlur}
+                                    FormHelperTextProps={{
+                                        sx: { marginTop: 0, marginBottom: '3px' },
+                                    }}
                                 />
                             )
                         }}
@@ -113,6 +106,7 @@ export const useFormController = <T extends Items>(
 
                             return (
                                 <DatePicker
+                                    autoFocus={field.focus}
                                     slotProps={{
                                         textField: { fullWidth: true, size },
                                     }}
@@ -145,16 +139,20 @@ export const useFormController = <T extends Items>(
 
                             return (
                                 <TextField
+                                    autoFocus={field.focus}
                                     fullWidth
                                     type='password'
                                     size={size}
                                     error={!!stringError}
-                                    helperText={stringError}
+                                    helperText={stringError || ' '}
                                     required={!!field.required}
                                     label={field.placeholder}
                                     value={value}
                                     onChange={fieldRender.onChange}
                                     onBlur={fieldRender.onBlur}
+                                    FormHelperTextProps={{
+                                        sx: { marginTop: 0, marginBottom: '3px' },
+                                    }}
                                 />
                             )
                         }}
@@ -169,5 +167,6 @@ export const useFormController = <T extends Items>(
         isSubmitting,
         isSubmitSuccessful,
         handleSubmit,
+        reset,
     }
 }
