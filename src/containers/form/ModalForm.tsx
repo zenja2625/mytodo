@@ -41,6 +41,9 @@ export const ModalForm = <T extends Items>({
                 reset()
             }
         }
+        else {
+            reset()
+        }
     }, [isOpen, defaultValues, reset])
 
     const close = useCallback(() => {

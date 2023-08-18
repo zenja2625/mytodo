@@ -68,6 +68,7 @@ export const todoFields: TodoFields = {
         type: 'text',
         required: 'This field is required',
         placeholder: 'Category Name',
+        focus: true
     },
     taskEnd: {
         type: 'date',

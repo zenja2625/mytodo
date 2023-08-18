@@ -15,7 +15,6 @@ import { useLoadDelay } from '../../hooks/useLoadDelay'
 import { Category, PutTodoDTO } from '../../slices/sliceTypes'
 import { TodoItem } from './TodoItem'
 import { SortableTree } from '../sortableTree/SortableTree'
-import { TodoItem1 } from './TodoItem1'
 import { useDebounce } from '../../hooks/useDebounce'
 import { TodoPositionDTO, TodoStatusDTO } from '../../api/apiTypes'
 import { todoFields } from '../../forms'
@@ -25,8 +24,24 @@ import { TodoItemContent } from './TodoItemContent'
 
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
+import { ModalForm } from '../form/ModalForm'
+
+type ModalDataType =
+    | {
+          type: 'create'
+          id?: string
+          addBefore?: boolean
+          defaultValues: PutTodoDTO
+      }
+    | {
+          type: 'edit'
+          id: string
+          defaultValues: PutTodoDTO
+      }
 
 export const Todos = memo(({ selectedCategory }: { selectedCategory: Category }) => {
+    const [modalData, setModalData] = useState<ModalDataType | null>(null)
+
     const withCompleted = useAppSelector(state => state.todos.withCompleted)
     const todos = useAppSelector(getTodos)
 
@@ -39,6 +54,15 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
 
     const openCreateModal = useCallback(
         (overId?: string, addBefore?: boolean) => {
+            setModalData({
+                type: 'create',
+                id: overId,
+                addBefore,
+                defaultValues: {
+                    value: '',
+                    taskEnd: undefined,
+                },
+            })
             // openModal(
             //     async data => {
             //         await dispatch(
@@ -59,7 +83,16 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
     )
 
     const openUpdateModal = useCallback(
-        (id: string, defaultValues?: PutTodoDTO) => {},
+        (id: string, defaultValues?: PutTodoDTO) => {
+            setModalData({
+                type: 'edit',
+                id,
+                defaultValues: {
+                    value: defaultValues?.value || '',
+                    taskEnd: defaultValues?.taskEnd,
+                },
+            })
+        },
         [selectedCategory, dispatch]
     )
 
@@ -120,27 +153,59 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
     )
 
     return (
-        <SortableTree
-            items={todos}
-            itemHeight={44}
-            gap={10}
-            renderItem={(item, handleProps) => (
-                <TodoItem
-                    item={item}
-                    handleProps={handleProps}
-                    categoryId={selectedCategory.id}
-                    openEditModal={openUpdateModal}
-                    openAddModal={openCreateModal}
-                />
-            )}
-            renderOverlay={item => (
-                <Box height={44} boxShadow={3}>
-                    <TodoItemContent item={item} />
-                </Box>
-            )}
-            onDrop={onDrop}
-            header={header}
-            footer={footer}
-        />
+        <>
+            <SortableTree
+                items={todos}
+                itemHeight={44}
+                gap={10}
+                renderItem={(item, handleProps) => (
+                    <TodoItem
+                        item={item}
+                        handleProps={handleProps}
+                        categoryId={selectedCategory.id}
+                        openEditModal={openUpdateModal}
+                        openAddModal={openCreateModal}
+                    />
+                )}
+                renderOverlay={item => (
+                    <Box height={44} boxShadow={3}>
+                        <TodoItemContent item={item} />
+                    </Box>
+                )}
+                onDrop={onDrop}
+                header={header}
+                footer={footer}
+            />
+            <ModalForm
+                fields={todoFields}
+                isOpen={!!modalData}
+                onSubmit={async data => {
+                    if (!modalData) return
+
+                    if (modalData.type === 'create') {
+                        await dispatch(
+                            createTodoThunk({
+                                categoryId: selectedCategory.id,
+                                value: data.value,
+                                taskEnd: data.taskEnd,
+                                overId: modalData.id,
+                                addBefore: modalData.addBefore,
+                            })
+                        )
+                    } else {
+                        await dispatch(
+                            updateTodoThunk({
+                                categoryId: selectedCategory.id,
+                                id: modalData.id,
+                                todoDTO: data,
+                            })
+                        )
+                    }
+                }}
+                setIsOpen={() => setModalData(null)}
+                title='Title'
+                defaultValues={modalData?.defaultValues}
+            />
+        </>
     )
 }, areEqual)

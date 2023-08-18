@@ -149,10 +149,10 @@ export const Categories = () => {
                 fields={categoryFields}
                 isOpen={!!editId}
                 //@ts-ignore
-                onSubmit={async (data, e) => {
+                onSubmit={async (data) => {
 
                     await new Promise(r => setTimeout(r, 1000))
-                    console.log(e)
+                    
 
                     // alert(JSON.stringify(data, null, 2))
                 }}
