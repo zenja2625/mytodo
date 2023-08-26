@@ -19,7 +19,16 @@ import { useDebounce } from '../../hooks/useDebounce'
 import { TodoPositionDTO, TodoStatusDTO } from '../../api/apiTypes'
 import { todoFields } from '../../forms'
 import { areEqual } from 'react-window'
-import { Box, Button, IconButton, Paper, Stack, ToggleButton, Typography } from '@mui/material'
+import {
+    Box,
+    Button,
+    IconButton,
+    Paper,
+    Stack,
+    ToggleButton,
+    Tooltip,
+    Typography,
+} from '@mui/material'
 import { TodoItemContent } from './TodoItemContent'
 
 import VisibilityIcon from '@mui/icons-material/Visibility'
@@ -126,19 +135,21 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
                 <Typography variant='h5' fontWeight='bold'>
                     {selectedCategory.name}
                 </Typography>
-                <IconButton
-                    onClick={() =>
-                        dispatch(
-                            getTodosThunk({
-                                categoryId: selectedCategory.id,
-                                withCompleted: !withCompleted,
-                            })
-                        )
-                    }
-                    color={withCompleted ? 'inherit' : 'default'}
-                >
-                    {withCompleted ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                </IconButton>
+                <Tooltip title={withCompleted ? 'Hide' : 'Show'}>
+                    <IconButton
+                        onClick={() =>
+                            dispatch(
+                                getTodosThunk({
+                                    categoryId: selectedCategory.id,
+                                    withCompleted: !withCompleted,
+                                })
+                            )
+                        }
+                        color={withCompleted ? 'inherit' : 'default'}
+                    >
+                        {withCompleted ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                    </IconButton>
+                </Tooltip>
             </Stack>
         )
     }, [selectedCategory, withCompleted, dispatch])
@@ -157,7 +168,7 @@ export const Todos = memo(({ selectedCategory }: { selectedCategory: Category })
             <SortableTree
                 items={todos}
                 itemHeight={44}
-                gap={10}
+                gap={1}
                 renderItem={(item, handleProps) => (
                     <TodoItem
                         item={item}

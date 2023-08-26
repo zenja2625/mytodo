@@ -14,18 +14,21 @@ import {
     Toolbar,
     Tooltip,
     Typography,
+    useTheme,
 } from '@mui/material'
 
 export const Header = memo(() => {
     const { isAuth, username } = useAppSelector(state => state.account)
     const requestCount = useAppSelector(state => state.app.requestCount)
 
+    const theme = useTheme()
+
     const dispatch = useAppDispatch()
 
     const showLoadIndicator = useLoadDelay(requestCount > 0, 500)
 
     return (
-        <AppBar position='static'>
+        <AppBar position='static' style={{ zIndex: theme.zIndex.drawer + 1 }}>
             <Toolbar style={{ minHeight: '60px' }}>
                 {isAuth && (
                     <IconButton

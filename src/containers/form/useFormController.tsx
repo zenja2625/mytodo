@@ -29,8 +29,11 @@ export const useFormController = <T extends Items>(
         reset,
         control,
         formState: { errors, isSubmitting, isDirty, isValid, isSubmitSuccessful },
-    } = useForm<FormData<T>>({ mode: 'onTouched', defaultValues, delayError: 200 })
-
+    } = useForm<FormData<T>>({
+        mode: 'onTouched',
+        values: defaultValues as any,
+        shouldUnregister: true,
+    })
     const canSubmit = !isSubmitting && isDirty && isValid
 
     useEffect(() => {
@@ -108,7 +111,7 @@ export const useFormController = <T extends Items>(
                                 <DatePicker
                                     autoFocus={field.focus}
                                     slotProps={{
-                                        textField: { fullWidth: true, size },
+                                        textField: { fullWidth: true, size, error: false },
                                     }}
                                     onChange={fieldRender.onChange}
                                     defaultValue={value}

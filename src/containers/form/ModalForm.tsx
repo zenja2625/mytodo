@@ -30,20 +30,10 @@ export const ModalForm = <T extends Items>({
     onSubmit,
 }: ModalFormProps<T>) => {
     const { canSubmit, handleSubmit, reset, inputs, isSubmitting, isSubmitSuccessful } =
-        useFormController(fields, size, validates)
+        useFormController(fields, size, validates, defaultValues)
 
     useEffect(() => {
-        if (isOpen) {
-            if (defaultValues) {
-                reset(defaultValues)
-            } else {
-                console.log('New')
-                reset()
-            }
-        }
-        else {
-            reset()
-        }
+        // reset(defaultValues)
     }, [isOpen, defaultValues, reset])
 
     const close = useCallback(() => {
@@ -52,7 +42,6 @@ export const ModalForm = <T extends Items>({
 
     useEffect(() => {
         if (isSubmitSuccessful) {
-            reset()
             close()
         }
     }, [isSubmitSuccessful, close])
@@ -63,7 +52,13 @@ export const ModalForm = <T extends Items>({
     }
 
     return (
-        <Dialog maxWidth='xs' fullWidth disableAutoFocus onClose={close} open={isOpen}>
+        <Dialog
+            maxWidth='xs'
+            fullWidth
+            disableAutoFocus
+            onClose={close}
+            open={isOpen}
+        >
             <DialogTitle>{title}</DialogTitle>
             <DialogContent sx={{ paddingBottom: '0px' }}>
                 <Stack component={'form'} onSubmit={handleSubmit(onSubmit)} marginTop={1}>
