@@ -7,8 +7,9 @@ import { getTodos } from '../../selectors/getTodos'
 import { useLoadDelay } from '../../hooks/useLoadDelay'
 import { getTodosThunk } from '../../slices/todosSlice'
 import { Category } from '../../slices/sliceTypes'
-import { Box, Container } from '@mui/material'
-import { LoadPage } from '../LoadPage'
+import { Container } from '@mui/material'
+import { LoadPage } from '../../components/LoadPage'
+import Box from '@mui/material/Box'
 
 export const TodosWrapper = () => {
     const prevSelectedCategoryRef = useRef<Category | null>(null)
@@ -23,6 +24,7 @@ export const TodosWrapper = () => {
 
     const showLoadPage = useLoadDelay(!!todosRequestId, 500)
 
+    //think about this
     const style: CSSProperties | undefined = !!todosRequestId
         ? {
               pointerEvents: 'none',
@@ -31,19 +33,19 @@ export const TodosWrapper = () => {
         : undefined
 
     return (
-        <div style={style} className='todos'>
-            <div className='todos-wrapper'>
+        <Box style={style} flexGrow={1} position='relative'>
+            <Box position='absolute' height='100%' width='100%'>
                 {loadedCategory ? (
                     <Todos selectedCategory={loadedCategory} />
                 ) : (
-                    <div className='todos-wrapper-center'>Choose Category</div>
+                    <div>Choose Category</div>
                 )}
-            </div>
+            </Box>
             {showLoadPage && (
-                <div className='todos-wrapper'>
+                <Box position='absolute' height='100%' width='100%'>
                     <LoadPage />
-                </div>
+                </Box>
             )}
-        </div>
+        </Box>
     )
 }

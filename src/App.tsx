@@ -1,12 +1,10 @@
 import { useEffect } from 'react'
 import { Outlet, useParams } from 'react-router-dom'
-import './App.css'
 import { Header } from './components/header/Header'
-import { LoadPage } from './containers/LoadPage'
+import { LoadPage } from './components/LoadPage'
 import { CategoryParamsType } from './containers/types'
 import { initializeApp } from './slices/appSlice'
 import { useAppDispatch, useAppSelector } from './slices/store'
-import moment from 'moment'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 

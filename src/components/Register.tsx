@@ -1,10 +1,10 @@
 import { useCallback } from 'react'
-import { UserRegisterDTO } from '../../api/apiTypes'
-import { registerFields } from '../../forms'
-import { registerThunk } from '../../slices/accountSlice'
-import { useAppDispatch } from '../../slices/store'
-import { Form } from '../form/Form'
-import { Validate } from '../form/types'
+import { UserRegisterDTO } from '../api/apiTypes'
+import { registerFields } from '../forms'
+import { registerThunk } from '../slices/accountSlice'
+import { useAppDispatch } from '../slices/store'
+import { Form } from '../containers/form/Form'
+import { Validate } from '../containers/form/types'
 import { Box, Stack, Typography } from '@mui/material'
 
 export const Register = () => {
@@ -35,8 +35,8 @@ export const Register = () => {
     }
 
     return (
-        <Box flexGrow={1} alignItems={'center'} justifyContent={'center'} display={'flex'}>
-            <Stack maxWidth={'400px'} spacing={3} flexGrow={1} m={4}>
+        <Box flexGrow={1} alignItems='center' justifyContent='center' display='flex'>
+            <Stack maxWidth='400px' spacing={3} flexGrow={1} m={4}>
                 <Typography textAlign='center' variant='h4'>
                     Sign up
                 </Typography>

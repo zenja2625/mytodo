@@ -33,6 +33,8 @@ import { FormData } from '../form/types'
 import { ModalForm } from '../form/ModalForm'
 
 export const Categories = () => {
+    console.log('Categoruries')
+
     const prevSmallScreen = useRef<boolean | null>(null)
     const prevCategoryId = useRef<string | null>(null)
     // const { categoryId } = useParams<CategoryParamsType>()
@@ -149,10 +151,8 @@ export const Categories = () => {
                 fields={categoryFields}
                 isOpen={!!editId}
                 //@ts-ignore
-                onSubmit={async (data) => {
-
+                onSubmit={async data => {
                     await new Promise(r => setTimeout(r, 1000))
-                    
 
                     // alert(JSON.stringify(data, null, 2))
                 }}

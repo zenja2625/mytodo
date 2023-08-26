@@ -3,29 +3,25 @@ import { useAppDispatch, useAppSelector } from '../../slices/store'
 import { toggleSider } from '../../slices/appSlice'
 import { Link } from 'react-router-dom'
 import { memo } from 'react'
-import { useLoadDelay } from '../../hooks/useLoadDelay'
 import MenuIcon from '@mui/icons-material/Menu'
 import {
     AppBar,
     Avatar,
     Button,
-    CircularProgress,
     IconButton,
     Toolbar,
     Tooltip,
     Typography,
     useTheme,
 } from '@mui/material'
+import { HeaderIndicator } from './HeaderIndicator'
 
 export const Header = memo(() => {
     const { isAuth, username } = useAppSelector(state => state.account)
-    const requestCount = useAppSelector(state => state.app.requestCount)
 
     const theme = useTheme()
 
     const dispatch = useAppDispatch()
-
-    const showLoadIndicator = useLoadDelay(requestCount > 0, 500)
 
     return (
         <AppBar position='static' style={{ zIndex: theme.zIndex.drawer + 1 }}>
@@ -51,7 +47,7 @@ export const Header = memo(() => {
                 >
                     MyTodo
                 </Typography>
-                {showLoadIndicator && <CircularProgress color='inherit' size={30} />}
+                <HeaderIndicator />
                 <Typography flexGrow={1} />
                 {isAuth ? (
                     <>

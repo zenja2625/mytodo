@@ -10,7 +10,7 @@ import {
     updateTodoThunk,
 } from '../../slices/todosSlice'
 import { getTodos } from '../../selectors/getTodos'
-import { LoadPage } from '../LoadPage'
+import { LoadPage } from '../../components/LoadPage'
 import { useLoadDelay } from '../../hooks/useLoadDelay'
 import { Category, PutTodoDTO } from '../../slices/sliceTypes'
 import { TodoItem } from './TodoItem'
